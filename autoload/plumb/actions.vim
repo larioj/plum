@@ -7,7 +7,7 @@ function! plumb#actions#Term(ctx)
 endfunction
 
 function! plumb#actions#Shell(ctx)
-  call plumb#actions#Scratch(ctx)
+  call plumb#actions#Scratch(a:ctx)
   execute '$read ! '. a:ctx.match
 endfunction
 
@@ -24,14 +24,14 @@ endfunction
 
 function! plumb#actions#File(ctx)
   if a:ctx.shift
-    execute "edit " . a:path
+    execute "edit " . a:ctx.match
   else
-    execute "below split " . a:path
+    execute "below split " . a:ctx.match
   endif
 endfunction
 
 function! plumb#actions#Dir(ctx)
   let l:path = a:ctx['match']
   let a:ctx['match'] = 'find ' . l:path . ' -maxdepth 1 | sort'
-  call plumb#actions#Shell(ctx)
+  call plumb#actions#Shell(a:ctx)
 endfunction

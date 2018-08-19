@@ -1,14 +1,14 @@
 function! plumb#core#Plumb(...)
   let l:options = call('plumb#core#ResolveOptions', a:000)
   if l:options['mode'] ==# 'v'
-    let l:options['selection'] = plumb#extensions#GetVisualSelection()
+    let l:options['vselection'] = plumb#extensions#GetVisualSelection()
   endif
   if l:options['mode'] ==# 'n' || l:options['mode'] ==# 'i'
     let l:options['line'] = plumb#extensions#GetLine()
     let l:options['cfile'] = plumb#extensions#GetPath()
   endif
   for l:action in b:Plumb_Actions + g:Plumb_Actions
-    if l:action['matcher'](l:options) && l:action['action'](l:options)
+    if l:action['matcher'](l:options) && !l:action['action'](l:options)
       return
     else
       call plumb#core#Debug(l:action['name'] . ' failed')

@@ -5,6 +5,8 @@ Commands: |
   $ git status
   $ git commit
 Files: |
+  $HOME/.vimrc
+  $HOME/.vim/plugin/plumb.vim
   README.md
   plugin/plumb.vim
   autoload/plumb/core.vim
@@ -13,3 +15,4 @@ Files: |
   autoload/plumb/extensions.vim
   autoload/plumb/util.vim
   autoload/plumb/system.vim
+  autoload/plumb/defaults.vim
