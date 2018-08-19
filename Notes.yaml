@@ -3,6 +3,7 @@ Workspace:
   : lcd $HOME/Projects/plumb
 Commands: |
   $ git status
+  $ git add .
   $ git commit
 Files: |
   $HOME/.vimrc

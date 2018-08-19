@@ -23,8 +23,26 @@ function! plumb#defaults#DefaultDirAction()
         \ }
 endfunction
 
+function! plumb#defaults#DefaultTermAction()
+  return {
+        \ 'name' : 'Default Term Action',
+        \ 'matcher' : function('plumb#matchers#TrimmedLineStartsWithCashSpace'),
+        \ 'action' : function('plumb#actions#Term'),
+        \ }
+endfunction
+
+function! plumb#defaults#DefaultExecAction()
+  return {
+        \ 'name' : 'Default Exec Action',
+        \ 'matcher' : function('plumb#matchers#TrimmedLineStartsWithColonSpace'),
+        \ 'action' : function('plumb#actions#Exec'),
+        \ }
+endfunction
+
 function! plumb#defaults#DefaultActions()
   return [ plumb#defaults#DefaultFileAction()
         \, plumb#defaults#DefaultDirAction()
+        \, plumb#defaults#DefaultExecAction()
+        \, plumb#defaults#DefaultTermAction()
         \]
 endfunction
