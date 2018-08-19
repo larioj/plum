@@ -1,0 +1,15 @@
+# Plumber
+Workspace:
+  : lcd $HOME/Projects/plumb
+Commands: |
+  $ git status
+  $ git commit
+Files: |
+  README.md
+  plugin/plumb.vim
+  autoload/plumb/core.vim
+  autoload/plumb/matchers.vim
+  autoload/plumb/actions.vim
+  autoload/plumb/extensions.vim
+  autoload/plumb/util.vim
+  autoload/plumb/system.vim
