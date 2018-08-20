@@ -1,4 +1,4 @@
-# Plumer
+# Plum
 This pluging brings some of the plan9port plumber functionality to vim.
 Inspired by [Acme](https://9fans.github.io/plan9port/man/man1/acme.html)
 editor's middle click and left click functionality.
