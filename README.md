@@ -25,3 +25,6 @@ call Plumb_SetLeftMouseBindings()
 ```
 ## TODO
 * [ ] Left click on word goes to search i.e. `nomal! *`
+
+## Contributing
+Pull request welcome :)
