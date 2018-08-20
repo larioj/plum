@@ -7,6 +7,9 @@ function! plum#core#Plum(...)
     let l:options['line'] = plum#extensions#GetLine()
     let l:options['cfile'] = plum#extensions#GetPath()
   endif
+
+  let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
+  let b:Plum_Actions = get(b:, 'Plum_Actions', [])
   for l:action in b:Plum_Actions + g:Plum_Actions
     if l:action['matcher'](l:options) && !l:action['action'](l:options)
       return
