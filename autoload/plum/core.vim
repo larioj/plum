@@ -1,4 +1,7 @@
 function! plum#core#Plum(...)
+  let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
+  let b:Plum_Actions = get(b:, 'Plum_Actions', [])
+
   let l:options = call('plum#core#ResolveOptions', a:000)
   if l:options['mode'] ==# 'v'
     let l:options['vselection'] = plum#extensions#GetVisualSelection()
@@ -8,8 +11,6 @@ function! plum#core#Plum(...)
     let l:options['cfile'] = plum#extensions#GetPath()
   endif
 
-  let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
-  let b:Plum_Actions = get(b:, 'Plum_Actions', [])
   for l:action in b:Plum_Actions + g:Plum_Actions
     if l:action['matcher'](l:options) && !l:action['action'](l:options)
       return
