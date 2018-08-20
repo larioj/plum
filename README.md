@@ -1,6 +1,13 @@
 # Plumber
 
 ## Installation Instructions
- 1. Install using Vundle or Pathogen
- 2. call Plumb_SetLeftMouseBindings()
- 
+Install using Vundle or Pathogen
+
+## Enabling Mouse Bidings
+Add the following to your .vimrc:
+
+```viml
+" Enable Mouse Bindings
+runtime pluging/plumb.vim
+call Plumb_SetLeftMouseBindings()
+```
