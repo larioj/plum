@@ -5,6 +5,9 @@ Commands: |
   $ git status
   $ git add .
   $ git commit
+  $ git pull
+  $ git push
+  $ git grep Plumb
 Files: |
   $HOME/.vimrc
   $HOME/.vim/plugin/plumb.vim

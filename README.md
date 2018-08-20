@@ -25,6 +25,7 @@ call Plumb_SetLeftMouseBindings()
 ```
 ## TODO
 * [ ] Left click on word goes to search i.e. `nomal! *`
+* [ ] Make filepaths accept line numbers
 
 ## Contributing
 Pull request welcome :)
