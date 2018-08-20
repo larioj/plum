@@ -1,4 +1,4 @@
-function! plumb#extensions#GetVisualSelection()
+function! plum#extensions#GetVisualSelection()
     let [line_start, column_start] = getpos("'<")[1:2]
     let [line_end, column_end] = getpos("'>")[1:2]
     let lines = getline(line_start, line_end)
@@ -10,10 +10,10 @@ function! plumb#extensions#GetVisualSelection()
     return join(lines, "\n")
 endfunction
 
-function! plumb#extensions#GetPath()
+function! plum#extensions#GetPath()
   return expand(expand("<cfile>"))
 endfunction
 
-function! plumb#extensions#GetLine()
+function! plum#extensions#GetLine()
   return getline(".")
 endfunction

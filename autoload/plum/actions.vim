@@ -1,17 +1,17 @@
-function! plumb#actions#Exec(ctx)
+function! plum#actions#Exec(ctx)
   execute a:ctx.match
 endfunction
 
-function! plumb#actions#Term(ctx)
+function! plum#actions#Term(ctx)
   execute 'terminal ' . a:ctx.match
 endfunction
 
-function! plumb#actions#Shell(ctx)
-  call plumb#actions#Scratch(a:ctx)
+function! plum#actions#Shell(ctx)
+  call plum#actions#Scratch(a:ctx)
   execute '$read ! '. a:ctx.match
 endfunction
 
-function! plumb#actions#Scratch(ctx)
+function! plum#actions#Scratch(ctx)
   if a:ctx.shift
     enew
   else
@@ -19,10 +19,10 @@ function! plumb#actions#Scratch(ctx)
   endif
   let l:dir = get(a:ctx, 'dir', '')
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
-  let b:plumb_basedir = l:dir
+  let b:plum_basedir = l:dir
 endfunction
 
-function! plumb#actions#File(ctx)
+function! plum#actions#File(ctx)
   if a:ctx.shift
     execute "edit " . a:ctx.match
   else
@@ -30,8 +30,8 @@ function! plumb#actions#File(ctx)
   endif
 endfunction
 
-function! plumb#actions#Dir(ctx)
+function! plum#actions#Dir(ctx)
   let l:path = a:ctx['match']
   let a:ctx['match'] = 'find ' . l:path . ' -maxdepth 1 | sort'
-  call plumb#actions#Shell(a:ctx)
+  call plum#actions#Shell(a:ctx)
 endfunction

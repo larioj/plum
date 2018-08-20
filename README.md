@@ -1,4 +1,4 @@
-# Plumber
+# Plumer
 This pluging brings some of the plan9port plumber functionality to vim.
 Inspired by [Acme](https://9fans.github.io/plan9port/man/man1/acme.html)
 editor's middle click and left click functionality.
@@ -20,8 +20,8 @@ Add the following to your .vimrc:
 
 ```viml
 " Enable Mouse Bindings
-runtime pluging/plumb.vim
-call Plumb_SetLeftMouseBindings()
+runtime pluging/plum.vim
+call Plum_SetLeftMouseBindings()
 ```
 ## TODO
 * [ ] Left click on word goes to search i.e. `nomal! *`

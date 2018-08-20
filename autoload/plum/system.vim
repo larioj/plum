@@ -1,42 +1,42 @@
-function! plumb#system#GetPathSep()
+function! plum#system#GetPathSep()
   return "/"
 endfunction
 
-function! plumb#system#IsAbsPath(path)
+function! plum#system#IsAbsPath(path)
   if a:path ==# ""
     return 0
   endif
-  let l:path = plumb#util#Trim(a:path)
+  let l:path = plum#util#Trim(a:path)
   let l:pathHead = strpart(l:path, 0, 1)
-  return l:pathHead ==# plumb#system#GetPathSep()
+  return l:pathHead ==# plum#system#GetPathSep()
 endfunction
 
-function! plumb#system#HasTrailSep(path)
+function! plum#system#HasTrailSep(path)
   if a:path ==# ""
     return 0
   endif
   let l:pathTail = strpart(a:path, len(a:path) -1, 1)
-  return l:pathTail ==# plumb#system#GetPathSep()
+  return l:pathTail ==# plum#system#GetPathSep()
 endfunction
 
-function! plumb#system#PathJoin(base, rel)
+function! plum#system#PathJoin(base, rel)
   if a:base ==# ""
     return a:rel
   endif
   if a:rel ==# ""
     return a:base
   endif
-  if plumb#system#HasTrailSep(a:base)
+  if plum#system#HasTrailSep(a:base)
     return a:base . a:rel
   else
     return a:base . "/" . a:rel
   endif
 endfunction
 
-function! plumb#system#FileExists(path)
+function! plum#system#FileExists(path)
   return filereadable(a:path)
 endfunction
 
-function! plumb#system#DirExists(path)
+function! plum#system#DirExists(path)
   return isdirectory(a:path)
 endfunction

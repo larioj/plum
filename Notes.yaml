@@ -1,22 +1,21 @@
-# Plumber
+# Plum
 Workspace:
-  : lcd $HOME/Projects/plumb
+  : lcd $HOME/Projects/plum
 Commands: |
   $ git status
   $ git add .
   $ git commit
   $ git pull
   $ git push
-  $ git grep Plumb
+  $ git grep lumb
+  $ git diff
 Files: |
-  $HOME/.vimrc
-  $HOME/.vim/plugin/plumb.vim
   README.md
-  plugin/plumb.vim
-  autoload/plumb/core.vim
-  autoload/plumb/matchers.vim
-  autoload/plumb/actions.vim
-  autoload/plumb/extensions.vim
-  autoload/plumb/util.vim
-  autoload/plumb/system.vim
-  autoload/plumb/defaults.vim
+  plugin/plum.vim
+  autoload/plum/core.vim
+  autoload/plum/matchers.vim
+  autoload/plum/actions.vim
+  autoload/plum/extensions.vim
+  autoload/plum/util.vim
+  autoload/plum/system.vim
+  autoload/plum/defaults.vim

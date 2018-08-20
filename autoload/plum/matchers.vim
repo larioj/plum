@@ -1,4 +1,4 @@
-function! plumb#matchers#MatchFso(options, FsoExists)
+function! plum#matchers#MatchFso(options, FsoExists)
   let l:mode = a:options['mode']
   if l:mode ==# 'v'
     let l:content = a:options['vselection']
@@ -8,10 +8,10 @@ function! plumb#matchers#MatchFso(options, FsoExists)
     let a:options['status'] = 'unknown mode'
     return 0
   endif
-  let l:content = plumb#util#Trim(l:content)
+  let l:content = plum#util#Trim(l:content)
 
   " Absolute file
-  if plumb#system#IsAbsPath(l:content)
+  if plum#system#IsAbsPath(l:content)
     if a:FsoExists(l:content)
       let a:options['match'] = l:content
       return 1
@@ -21,9 +21,9 @@ function! plumb#matchers#MatchFso(options, FsoExists)
     endif
   endif
 
-  " Relative to plumb base
-  if exists('b:Plumb_BaseDir')
-    let l:fullpath =  plumb#system#PathJoin(b:Plumb_BaseDir, l:content)
+  " Relative to plum base
+  if exists('b:Plum_BaseDir')
+    let l:fullpath =  plum#system#PathJoin(b:Plum_BaseDir, l:content)
     if a:FsoExists(l:fullpath)
       let a:options['match'] = l:fullpath
       return 1
@@ -37,7 +37,7 @@ function! plumb#matchers#MatchFso(options, FsoExists)
   endif
 
   " File relative to cwd
-  let l:fullpath = plumb#system#PathJoin(getcwd(), l:content)
+  let l:fullpath = plum#system#PathJoin(getcwd(), l:content)
   if a:FsoExists(l:fullpath)
     let a:options['match'] = l:fullpath
     return 1
@@ -45,7 +45,7 @@ function! plumb#matchers#MatchFso(options, FsoExists)
 
   " File relative to buffer
   let l:bufferdir = expand('%:p:h')
-  let l:fullpath =  plumb#system#PathJoin(l:bufferdir, l:content)
+  let l:fullpath =  plum#system#PathJoin(l:bufferdir, l:content)
   if a:FsoExists(l:fullpath)
     let a:options['match'] = l:fullpath
     return 1
@@ -55,15 +55,15 @@ function! plumb#matchers#MatchFso(options, FsoExists)
   return 0
 endfunction
 
-function! plumb#matchers#File(options)
-  return plumb#matchers#MatchFso(a:options, function('plumb#system#FileExists'))
+function! plum#matchers#File(options)
+  return plum#matchers#MatchFso(a:options, function('plum#system#FileExists'))
 endfunction
 
-function! plumb#matchers#Dir(options)
-  return plumb#matchers#MatchFso(a:options, function('plumb#system#DirExists'))
+function! plum#matchers#Dir(options)
+  return plum#matchers#MatchFso(a:options, function('plum#system#DirExists'))
 endfunction
 
-function! plumb#matchers#TrimmedLineStartsWith(options, preffix)
+function! plum#matchers#TrimmedLineStartsWith(options, preffix)
   let l:mode = a:options['mode']
   if l:mode ==# 'v'
     let l:content = a:options['vselection']
@@ -73,7 +73,7 @@ function! plumb#matchers#TrimmedLineStartsWith(options, preffix)
     let a:options['status'] = 'unknown mode'
     return 0
   endif
-  let l:content = plumb#util#Trim(l:content)
+  let l:content = plum#util#Trim(l:content)
   let l:actual = strpart(l:content, 0, len(a:preffix))
   if a:preffix ==# l:actual
     let a:options['match'] = strpart(l:content, len(a:preffix), len(l:content))
@@ -83,28 +83,28 @@ function! plumb#matchers#TrimmedLineStartsWith(options, preffix)
   return 0
 endfunction
 
-function! plumb#matchers#TrimmedLineStartsWithCashSpace(options)
-  return plumb#matchers#TrimmedLineStartsWith(a:options, '$ ')
+function! plum#matchers#TrimmedLineStartsWithCashSpace(options)
+  return plum#matchers#TrimmedLineStartsWith(a:options, '$ ')
 endfunction
 
-function! plumb#matchers#TrimmedLineStartsWithColonSpace(options)
-  return plumb#matchers#TrimmedLineStartsWith(a:options, ': ')
+function! plum#matchers#TrimmedLineStartsWithColonSpace(options)
+  return plum#matchers#TrimmedLineStartsWith(a:options, ': ')
 endfunction
 
-function! plumb#matchers#Test()
+function! plum#matchers#Test()
   let l:options = { 'line' : ': hello', 'mode' : 'n', 'shift' : 0, }
-  if !plumb#matchers#TrimmedLineStartsWithColonSpace(l:options) ||
+  if !plum#matchers#TrimmedLineStartsWithColonSpace(l:options) ||
       \ get(l:options, 'match', '') !=# 'hello'
     echo 'Failed: Colon True'
   endif
 
   let l:options = { 'line' : '$ hello', 'mode' : 'n', 'shift' : 0, }
-  if plumb#matchers#TrimmedLineStartsWithColonSpace(l:options)
+  if plum#matchers#TrimmedLineStartsWithColonSpace(l:options)
     echo 'Failed: Colon False'
   endif
 
   let l:options = { 'cfile': 'plugin', 'mode' : 'n', 'shift' : 0, }
-  if !plumb#matchers#Dir(l:options)
+  if !plum#matchers#Dir(l:options)
     echo l:options['status']
     echo 'Failed: Dir'
   endif
