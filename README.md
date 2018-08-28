@@ -23,7 +23,7 @@ Add the following to your .vimrc:
 
 ```viml
 " Enable Mouse Bindings
-runtime pluging/plum.vim
+runtime plugin/plum.vim
 call Plum_SetLeftMouseBindings()
 ```
 ## TODO
