@@ -11,7 +11,7 @@ function! plum#actions#DeleteIfEmpty(job, status)
 endfunction
 
 function! plum#actions#Term(ctx)
-  let l:callback = {'exit_cb': 'TODO'}
+  let l:callback = {'exit_cb': 'plum#actions#DeleteIfEmpty'}
   let l:command = ['/bin/sh', '-ic', a:ctx.match]
   call term_start(l:command, l:callback)
 endfunction
