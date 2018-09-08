@@ -17,3 +17,7 @@ endfunction
 function! plum#extensions#GetLine()
   return getline(".")
 endfunction
+
+function! plum#extensions#GetBufferContents()
+  return join(getline(1, '$'), "\n")
+endfunction

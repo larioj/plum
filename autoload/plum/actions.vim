@@ -2,8 +2,18 @@ function! plum#actions#Exec(ctx)
   execute a:ctx.match
 endfunction
 
+function! plum#actions#DeleteIfEmpty(job, status)
+  let l:contents = plum#util#Trim(
+        \ plum#extensions#GetBufferContents())
+  if l:contents ==# ''
+    q
+  endif
+endfunction
+
 function! plum#actions#Term(ctx)
-  execute 'terminal ' . a:ctx.match
+  let l:callback = {'exit_cb': 'TODO'}
+  let l:command = ['/bin/sh', '-ic', a:ctx.match]
+  call term_start(l:command, l:callback)
 endfunction
 
 function! plum#actions#Shell(ctx)

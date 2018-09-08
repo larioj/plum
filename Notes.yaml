@@ -7,7 +7,6 @@ Commands: |
   $ git commit
   $ git pull
   $ git push
-  $ git grep lumb
   $ git diff
 Files: |
   README.md
