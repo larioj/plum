@@ -3,6 +3,7 @@ function! plum#actions#Exec(ctx)
 endfunction
 
 function! plum#actions#DeleteIfEmpty(job, status)
+  call term_wait(expand('%'))
   let l:contents = plum#util#Trim(
         \ plum#extensions#GetBufferContents())
   if l:contents ==# ''
