@@ -9,6 +9,7 @@ function! plum#actions#DeleteIfEmpty(job, status)
   if l:contents ==# ''
     q
   endif
+  set modifiable
 endfunction
 
 function! plum#actions#Term(ctx)
