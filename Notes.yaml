@@ -4,7 +4,8 @@ Workspace:
 Commands: |
   $ git status
   $ git add .
-  $ git commit
+  $ git commit -q
+  $ git diff
   $ git pull
   $ git push
   $ git diff

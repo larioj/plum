@@ -4,12 +4,13 @@ endfunction
 
 function! plum#actions#DeleteIfEmpty(job, status)
   call term_wait(expand('%'))
-  set modifiable
-  setlocal buftype=nofile
   let l:contents = plum#util#Trim(
         \ plum#extensions#GetBufferContents())
   if l:contents ==# '' && a:status ==# 0
     q
+  elseif &buftype ==# 'terminal'
+    set modifiable
+    setlocal buftype=nofile
   endif
 endfunction
 
