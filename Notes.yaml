@@ -7,8 +7,10 @@ Commands: |
   $ git commit -q
   $ git diff
   $ git pull
-  $ git push
+  $ git push -q
   $ git diff
+  : PluginUpdate
+  : qa
 Files: |
   README.md
   plugin/plum.vim
