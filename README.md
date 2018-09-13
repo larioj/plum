@@ -27,7 +27,7 @@ runtime plugin/plum.vim
 call Plum_SetLeftMouseBindings()
 ```
 ## TODO
-* [x] Make terinal expand variables
+* [x] Make terminal expand variables
 * [ ] Make non-existent paths, with existing dir open a buffer
 * [ ] Left click on word goes to search i.e. `nomal! *`
 * [ ] Make filepaths accept line numbers
