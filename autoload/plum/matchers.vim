@@ -63,6 +63,35 @@ function! plum#matchers#Dir(options)
   return plum#matchers#MatchFso(a:options, function('plum#system#DirExists'))
 endfunction
 
+function! plum#matchers#BashCommand(options)
+  let l:prefix = "$ "
+  let l:mode = a:options['mode']
+  if l:mode ==# 'v'
+    let l:content = a:options['vselection']
+  elseif l:mode ==# 'n' || l:mode == 'i'
+    let l:cur = line('.')
+    let l:curline = getline(l:cur)
+    let l:lines = [l:curline]
+    while l:curline[-1:] ==# "\\"
+      let l:cur += 1
+      let l:curline = getline(l:cur)
+      let l:lines = l:lines + [l:curline]
+    endwhile
+    let l:content = join(l:lines, "\n")
+  else
+    let a:options['status'] = 'unknown mode'
+    return 0
+  endif
+  let l:content = plum#util#Trim(l:content)
+  let l:actual = strpart(l:content, 0, len(l:prefix))
+  if l:prefix ==# l:actual
+    let a:options['match'] = strpart(l:content, len(l:prefix), len(l:content))
+    return 1
+  endif
+  let a:options['status'] = "Match Failed: End of function"
+  return 0
+endfunction
+
 function! plum#matchers#TrimmedLineStartsWith(options, preffix)
   let l:mode = a:options['mode']
   if l:mode ==# 'v'
