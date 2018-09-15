@@ -9,6 +9,7 @@ Commands: |
   $ git pull
   $ git push -q
   $ git diff
+  $ git grep
   : PluginUpdate
   : qa
 Files: |

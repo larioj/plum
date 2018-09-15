@@ -26,7 +26,7 @@ endfunction
 function! plum#defaults#DefaultTermAction()
   return {
         \ 'name' : 'Default Term Action',
-        \ 'matcher' : function('plum#matchers#TrimmedLineStartsWithCashSpace'),
+        \ 'matcher' : function('plum#matchers#BashCommand'),
         \ 'action' : function('plum#actions#Term'),
         \ }
 endfunction

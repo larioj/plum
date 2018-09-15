@@ -112,10 +112,6 @@ function! plum#matchers#TrimmedLineStartsWith(options, preffix)
   return 0
 endfunction
 
-function! plum#matchers#TrimmedLineStartsWithCashSpace(options)
-  return plum#matchers#TrimmedLineStartsWith(a:options, '$ ')
-endfunction
-
 function! plum#matchers#TrimmedLineStartsWithColonSpace(options)
   return plum#matchers#TrimmedLineStartsWith(a:options, ': ')
 endfunction
