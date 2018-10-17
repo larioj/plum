@@ -1,6 +1,6 @@
 # Plum
 Workspace:
-  : lcd $HOME/Projects/plum
+  : lcd $HOME/Projects/plum | vsplit
 Commands: |
   $ git status
   $ git add .
@@ -10,6 +10,7 @@ Commands: |
   $ git push -q
   $ git diff
   $ git grep
+  $ git checkout -q master
   : PluginUpdate
   : qa
 Files: |
