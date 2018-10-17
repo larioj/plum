@@ -18,6 +18,9 @@ function! plum#actions#DeleteIfEmpty(job, status)
 endfunction
 
 function! plum#actions#Term(ctx)
+  if !has('terminal')
+    return 1 " fail if vim does not have terminal
+  endif
   let l:curdir = getcwd()
   let l:options =
         \ { 'exit_cb'   : 'plum#actions#DeleteIfEmpty'
