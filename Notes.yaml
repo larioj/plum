@@ -11,6 +11,7 @@ Commands: |
   $ git diff
   $ git grep
   $ git checkout -q master
+  $ git rebase --continue
   : PluginUpdate
   : qa
 Files: |

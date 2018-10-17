@@ -9,31 +9,42 @@ endfunction
 
 function! plum#defaults#DefaultFileAction()
   return {
-        \ 'name' : 'Default Files Action',
+        \ 'name' : 'DefaultFileAction',
         \ 'matcher' : function('plum#matchers#File'),
         \ 'action' : function('plum#actions#File'),
         \ }
 endfunction
 
-function! plum#defaults#DefaultDirAction()
+function! plum#defaults#DefaultDirectoryAction()
   return {
-        \ 'name' : 'Default Directory Action',
+        \ 'name' : 'DefaultDirectoryAction',
         \ 'matcher' : function('plum#matchers#Dir'),
         \ 'action' : function('plum#actions#Dir'),
         \ }
 endfunction
 
-function! plum#defaults#DefaultTermAction()
+function! plum#defaults#DefaultTerminalAction()
   return {
-        \ 'name' : 'Default Term Action',
+        \ 'name' : 'DefaultTerminalAction',
         \ 'matcher' : function('plum#matchers#BashCommand'),
         \ 'action' : function('plum#actions#Term'),
         \ }
 endfunction
 
-function! plum#defaults#DefaultExecAction()
+" Automatically closes empty windows
+" Not default because it will cause seg fault
+" on certain vim versions
+function! plum#defaults#SmartTerminalAction()
   return {
-        \ 'name' : 'Default Exec Action',
+        \ 'name' : 'SmartTerminalAction',
+        \ 'matcher' : function('plum#matchers#BashCommand'),
+        \ 'action' : function('plum#actions#SmartTerm'),
+        \ }
+endfunction
+
+function! plum#defaults#DefaultVimCommandAction()
+  return {
+        \ 'name' : 'DefaultVimCommandAction',
         \ 'matcher' : function('plum#matchers#TrimmedLineStartsWithColonSpace'),
         \ 'action' : function('plum#actions#Exec'),
         \ }
@@ -41,8 +52,8 @@ endfunction
 
 function! plum#defaults#DefaultActions()
   return [ plum#defaults#DefaultFileAction()
-        \, plum#defaults#DefaultDirAction()
-        \, plum#defaults#DefaultExecAction()
-        \, plum#defaults#DefaultTermAction()
+        \, plum#defaults#DefaultDirectoryAction()
+        \, plum#defaults#DefaultVimCommandAction()
+        \, plum#defaults#DefaultTerminalAction()
         \]
 endfunction
