@@ -21,3 +21,19 @@ endfunction
 function! plum#extensions#GetBufferContents()
   return join(getline(1, '$'), "\n")
 endfunction
+
+function! plum#extensions#WindowList()
+  return map(range(1, winnr('$')), '[v:val, bufname(winbufnr(v:val))]')
+endfunction
+
+function! plum#extensions#WindowByName()
+  let l:r = {}
+  for pair in plum#extensions#WindowList()
+    let l:r[pair[1]] = pair[0]
+  endfor
+  return l:r
+endfunction
+
+function! plum#extensions#SwitchToWindow(idx)
+  execute a:idx . 'wincmd w'
+endfunction

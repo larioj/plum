@@ -3,7 +3,10 @@ function! plum#actions#Exec(ctx)
 endfunction
 
 function! plum#actions#DeleteIfEmpty(job, status)
-  call term_wait(expand('%'))
+  call term_wait(expand('%'), 1000)
+  call term_wait(expand('%'), 1000)
+  call term_wait(expand('%'), 1000)
+  call term_wait(expand('%'), 1000)
   let l:contents = plum#util#Trim(
         \ plum#extensions#GetBufferContents())
   if l:contents ==# '' && a:status ==# 0
@@ -15,10 +18,17 @@ function! plum#actions#DeleteIfEmpty(job, status)
 endfunction
 
 function! plum#actions#Term(ctx)
+  let l:curdir = getcwd()
   let l:options =
         \ { 'exit_cb'   : 'plum#actions#DeleteIfEmpty'
         \ , 'term_name' : a:ctx.match
+        \ , 'cwd'       : l:curdir
         \ }
+  let l:wins = plum#extensions#WindowByName()
+  if has_key(l:wins, a:ctx.match)
+    call plum#extensions#SwitchToWindow(l:wins[a:ctx.match])
+    let l:options.curwin = 1
+  endif
   let l:command = ['/bin/sh', '-ic', a:ctx.match]
   call term_start(l:command, l:options)
 endfunction
