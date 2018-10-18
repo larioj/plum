@@ -8,10 +8,11 @@ Commands: |
   $ git diff
   $ git pull
   $ git push -q
-  $ git diff
+  $ git diff master
   $ git grep
   $ git checkout -q master
   $ git rebase --continue
+  $ git grep FindIndex
   : PluginUpdate
   : qa
 Files: |
