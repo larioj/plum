@@ -4,8 +4,8 @@ let b:Plum_DebugEnabled = get(b:, 'Plum_DebugEnabled', 0)
 let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
 let b:Plum_Actions = get(b:, 'Plum_Actions', [])
 
-function! Plum_SetLeftMouseBindings()
-  call plum#defaults#SetLeftMouseBindings()
+function! Plum_SetRightMouseBindings()
+  call plum#defaults#SetRightMouseBindings()
 endfunction
 
 function! Plum_CreateAction(name, matcher, action)

@@ -8,13 +8,11 @@ Commands: |
   $ git diff
   $ git pull
   $ git push -q
-  $ git diff master
+  $ git diff
   $ git grep
   $ git checkout -q master
   $ git rebase --continue
-  $ git grep FindIndex
-  : PlugInstall
-  : PlugUpdate
+  $ git stash
   : qa
 Files: |
   README.md

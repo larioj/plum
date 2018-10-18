@@ -25,7 +25,7 @@ Add the following to your .vimrc:
 " Enable Mouse Bindings
 set mouse=a
 runtime plugin/plum.vim
-call Plum_SetLeftMouseBindings()
+call Plum_SetRightMouseBindings()
 ```
 
 ## A Smarter Terminal Action
@@ -39,7 +39,7 @@ this may segfault. Beware :|
 " Enable Mouse Bindings
 set mouse=a
 runtime plugin/plum.vim
-call Plum_SetLeftMouseBindings()
+call Plum_SetRightMouseBindings()
 
 " Replace default terminal action with smart terminal action
 " this may cause segfaults on some vims :|

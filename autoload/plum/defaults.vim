@@ -1,4 +1,4 @@
-function! plum#defaults#SetLeftMouseBindings()
+function! plum#defaults#SetRightMouseBindings()
   nnoremap <RightMouse> <LeftMouse>:call plum#core#Plum({'mode' : 'n',})<cr>
   vnoremap <RightMouse> <LeftMouse>:<c-u>call plum#core#Plum({'mode': visualmode(),})<cr>
   inoremap <RightMouse> <LeftMouse><esc>:call plum#core#Plum({'mode': 'i',})<cr>
