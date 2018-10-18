@@ -13,7 +13,8 @@ Commands: |
   $ git checkout -q master
   $ git rebase --continue
   $ git grep FindIndex
-  : PluginUpdate
+  : PlugInstall
+  : PlugUpdate
   : qa
 Files: |
   README.md
