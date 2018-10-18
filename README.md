@@ -28,9 +28,9 @@ call Plum_SetLeftMouseBindings()
 ```
 ## TODO
 * [x] Make terminal expand variables
-* [ ] Make non-existent paths, with existing dir open a buffer
-* [ ] Left click on word goes to search i.e. `nomal! *`
+* [ ] Make terminal action work on vim w/o +terminal
 * [ ] Make filepaths accept line numbers
+* [ ] Left click on word goes to search i.e. `nomal! *`
 
 ## Contributing
 Pull request welcome :)
