@@ -42,7 +42,7 @@ endfunction
 
 function! plum#util#Fun(str_or_fun)
   if type(a:str_or_fun) ==# type("")
-    return function(str_or_fun)
+    return function(a:str_or_fun)
   endif
-  return str_or_fun
+  return a:str_or_fun
 endfunction
