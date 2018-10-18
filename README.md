@@ -23,9 +23,31 @@ Add the following to your .vimrc:
 
 ```viml
 " Enable Mouse Bindings
+set mouse=a
 runtime plugin/plum.vim
 call Plum_SetLeftMouseBindings()
 ```
+
+## A Smarter Terminal Action
+If you would like empty terminal windows to automatically close, and the
+commands to reuse any old open windows, you can change the default terminal
+action. This is what I use in my setup, but given that the terminal feature
+is experimental, I've been running into some issues. On some versions of vim
+this may segfault. Beware :|
+
+```viml
+" Enable Mouse Bindings
+set mouse=a
+runtime plugin/plum.vim
+call Plum_SetLeftMouseBindings()
+
+" Replace default terminal action with smart terminal action
+" this may cause segfaults on some vims :|
+call Plum_ReplaceNamedAction(
+      \ 'DefaultTerminalAction',
+      \ plum#defaults#SmartTerminalAction())
+```
+
 ## TODO
 * [x] Make terminal expand variables
 * [ ] Make terminal action work on vim w/o +terminal
