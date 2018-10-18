@@ -17,7 +17,7 @@ function! plum#actions#DeleteIfEmpty(job, status)
   endif
 endfunction
 
-function! plum#actions#Term(ctx)
+function! plum#actions#SmartTerm(ctx)
   if !has('terminal')
     return 1 " fail if vim does not have terminal
   endif
@@ -34,6 +34,14 @@ function! plum#actions#Term(ctx)
   endif
   let l:command = ['/bin/sh', '-ic', a:ctx.match]
   call term_start(l:command, l:options)
+endfunction
+
+function! plum#actions#Term(ctx)
+  if !has('terminal')
+    return 1 " fail if vim does not have terminal
+  endif
+  let l:command = ['/bin/sh', '-ic', a:ctx.match]
+  call term_start(l:command)
 endfunction
 
 function! plum#actions#Shell(ctx)

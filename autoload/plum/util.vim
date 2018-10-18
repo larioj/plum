@@ -40,3 +40,9 @@ function! plum#util#Trim(str)
   return a:str[l:s : l:e]
 endfunction
 
+function! plum#util#Fun(str_or_fun)
+  if type(a:str_or_fun) ==# type("")
+    return function(a:str_or_fun)
+  endif
+  return a:str_or_fun
+endfunction
