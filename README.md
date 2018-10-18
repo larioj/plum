@@ -31,8 +31,7 @@ call Plum_SetRightMouseBindings()
 ## A Smarter Terminal Action
 If you would like empty terminal windows to automatically close, and the
 commands to reuse any old open windows, you can change the default terminal
-action. This is what I use in my setup, but given that the terminal feature
-is experimental, I've been running into some issues. On some versions of vim
+action. This is what I use in my setup. However, on some versions of vim
 this may segfault. Beware :|
 
 ```viml
