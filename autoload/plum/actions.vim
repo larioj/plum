@@ -28,7 +28,7 @@ function! plum#actions#SmartTerm(ctx)
         \ , 'cwd'       : l:curdir
         \ }
   let l:wins = plum#extensions#WindowByName()
-  if has_key(a:ctx.shift) && a:ctx.shift
+  if has_key(a:ctx, 'shift') && a:ctx.shift
     let l:options.curwin = 1
   elseif has_key(l:wins, a:ctx.match)
     call plum#extensions#SwitchToWindow(l:wins[a:ctx.match])
@@ -42,8 +42,12 @@ function! plum#actions#Term(ctx)
   if !has('terminal')
     return 1 " fail if vim does not have terminal
   endif
+  let l:options = {}
+  if has_key(a:ctx, 'shift') && a:ctx.shift
+    let l:options.curwin = 1
+  endif
   let l:command = ['/bin/sh', '-ic', a:ctx.match]
-  call term_start(l:command)
+  call term_start(l:command, l:options)
 endfunction
 
 function! plum#actions#Shell(ctx)
