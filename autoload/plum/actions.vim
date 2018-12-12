@@ -28,7 +28,9 @@ function! plum#actions#SmartTerm(ctx)
         \ , 'cwd'       : l:curdir
         \ }
   let l:wins = plum#extensions#WindowByName()
-  if has_key(l:wins, a:ctx.match)
+  if has_key(a:ctx.shift) && a:ctx.shift
+    let l:options.curwin = 1
+  elseif has_key(l:wins, a:ctx.match)
     call plum#extensions#SwitchToWindow(l:wins[a:ctx.match])
     let l:options.curwin = 1
   endif
@@ -69,7 +71,12 @@ function! plum#actions#File(ctx)
 endfunction
 
 function! plum#actions#Dir(ctx)
-  let l:path = a:ctx['match']
-  let a:ctx['match'] = 'find ' . l:path . ' -maxdepth 1 | sort'
-  call plum#actions#Shell(a:ctx)
+  let l:path = plum#util#Trim(a:ctx['match'])
+  let l:end = strpart(l:path, len(l:path) - 1, len(l:path))
+  if l:end ==# "/"
+    let l:path = strpart(l:path, 0, len(l:path) - 1)
+  endif
+  let a:ctx.match =
+        \ '(GLOBIGNORE=".:.."; for a in ' . l:path . '/*; do echo $a; done)'
+  call plum#actions#Term(a:ctx)
 endfunction
