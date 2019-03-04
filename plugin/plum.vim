@@ -16,6 +16,11 @@ function! Plum_CreateAction(name, matcher, action)
         \ }
 endfunction
 
+function! Plum_AppendAction(action)
+  let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
+  call add(g:Plum_Actions, a:action)
+endfunction
+
 function! Plum_InsertAction(index, action)
   let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
   call insert (g:Plum_Actions, a:action, a:index)
