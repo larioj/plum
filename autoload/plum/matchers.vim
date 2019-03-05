@@ -1,14 +1,24 @@
-function! plum#matchers#MatchFso(options, FsoExists)
-  let l:mode = a:options['mode']
-  if l:mode ==# 'v'
-    let l:content = a:options['vselection']
-  elseif l:mode ==# 'n' || l:mode == 'i'
-    let l:content = a:options['cfile']
+function! plum#matchers#FileUnderCursor(ctx)
+  let ctx = a:ctx
+  if ctx.mode ==# 'v'
+    let ctx.match = ctx.vselection
+  elseif ctx.mode == 'n' || ctx.mode == 'i'
+    let ctx.match = ctx.cfile
   else
-    let a:options['status'] = 'unknown mode'
+    let cxt.status = 'unknown mode'
     return 0
   endif
-  let l:content = plum#util#Trim(l:content)
+  let ctx.match = plum#util#Trim(ctx.match)
+  return 1
+endfunction
+
+function! plum#matchers#MatchFso(options, FsoExists, MatchContent)
+  let l:content = ''
+  if a:MatchContent(a:options)
+    let l:content = a:options.match
+  else
+    return 0
+  endif
 
   " Absolute file
   if plum#system#IsAbsPath(l:content)
@@ -56,11 +66,13 @@ function! plum#matchers#MatchFso(options, FsoExists)
 endfunction
 
 function! plum#matchers#File(options)
-  return plum#matchers#MatchFso(a:options, function('plum#system#FileExists'))
+  return plum#matchers#MatchFso(a:options, function('plum#system#FileExists'),
+        \ function('plum#matchers#FileUnderCursor'))
 endfunction
 
 function! plum#matchers#Dir(options)
-  return plum#matchers#MatchFso(a:options, function('plum#system#DirExists'))
+  return plum#matchers#MatchFso(a:options, function('plum#system#DirExists'),
+        \ function('plum#matchers#FileUnderCursor'))
 endfunction
 
 function! plum#matchers#BashCommand(options)
