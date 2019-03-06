@@ -1,28 +1,47 @@
 # Plum
-This pluging brings some of the plan9port plumber functionality to vim.
-Inspired by [Acme](https://9fans.github.io/plan9port/man/man1/acme.html)
+Right click on text to execute an action. The action that executes is dependent
+on the text clicked.
+
+This plugin was inspired by [Acme](https://9fans.github.io/plan9port/man/man1/acme.html)
 editor's middle click and left click functionality.
 
 ## Development Status
-This is a very new plugin. Still testing it out. It may have lots of bugs, and the API may change.
+This is a very new plugin. Still testing it out. It may have lots of bugs,
+and the interface may change.
+
+## Demo
 
 <a href="https://cl.ly/0a0C1S263C3Q" target="_blank"><img src="https://drh2acu5z204m.cloudfront.net/items/0A1E1l2q412U1c1C062n/Screen%20Recording%202018-08-19%20at%2008.36%20PM.gif" style="display: block;height: auto;width: 100%;"/></a>
 
-## Default Functionalty
-* Left Click on File Path -> Open File in split
-* Left Click on Dir Path -> Open scratch buffer with find listing
-* Left Click on ': some-text' -> execute command as viml (note: space after : is not optional)
-* Left Click on '$ some-text' -> execute command in terminal (note: space after $ is not optional)
-* Shift Left Click same as Shift Left but opens in same window
+## plum#fso#Directory()
+Right click on an existing directory to open a window that lists the contents of
+that directory.
+
+## plum#fso#File()
+Right click on file path to open the file.
+
+## plum#term#Terminal()
+Right click on a line starting with `$` to execute the command as `bash` in a new terminal window.
+**Note** that there needs to be space between the `$` and the command i.e. `$ echo
+hello` **NOT** `$echo hello`.
+**Note** requires a vim that `has('terminal') != 0`.
+
+## plum#term#SmartTerminal()
+Same as above but automatically closes empty windows and reuses windows for the
+same command. **BEWARE** this may cause **segfaults** on some vim versions.
+**Note** requires a vim that `has('terminal') != 0`.
+
+## plum#vim#Execute()
+Right click on a line starting with `:` to execute the command as `viml`.
+**Note** that there needs to be space between the `:` and the command i.e. `:
+echo 'foo'` **NOT** `:echo 'foo'`.
 
 ## Installation Instructions
 Install using Vundle or Pathogen
 
-## Enabling Mouse Bidings
+## Enabling Mouse Bindings
 Add the following to your .vimrc:
-
 ```viml
-" Enable Mouse Bindings
 set mouse=a
 call plum#SetBindings()
 let g:Plum_Actions = [
@@ -33,12 +52,7 @@ let g:Plum_Actions = [
       \ ]
 ```
 
-## A Smarter Terminal Action
-If you would like empty terminal windows to automatically close, and the
-commands to reuse any old open windows, you can change the default terminal
-action. This is what I use in my setup. However, on some versions of vim
-this may segfault. Beware :|
-
+Or if you would like to use the smart terminal action:
 ```viml
 " Enable Mouse Bindings
 set mouse=a
@@ -51,11 +65,22 @@ let g:Plum_Actions = [
       \ ]
 ```
 
+## Extension Plugins
+* [plum-tree](https://github.com/larioj/plum-tree)
+* [plum-purescript](https://github.com/larioj/plum-purescript)
+
+## Developing Your Own Actions
+**TODO** Open an issue if you would like some advice, and the I'll fill thin in.
+[plum-tree](https://github.com/larioj/plum-tree) is an intermediate example of how to do this.
+
 ## TODO
-* [x] Make terminal expand variables
 * [ ] Make terminal action work on vim w/o +terminal
-* [ ] Make filepaths accept line numbers
-* [ ] Left click on word goes to search i.e. `nomal! *`
+* [ ] Make file paths accept line numbers
+* [ ] Catch all right click on word goes to next occurrence
 
 ## Contributing
-Pull request welcome :)
+Use it! File bugs, and create pull requests :)
+
+## Contributing Actions
+Create a plugin a then create a pull request to link it from this readme.
+[plum-purescript](https://github.com/larioj/plum-purescript) is a very small example.
