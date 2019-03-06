@@ -44,7 +44,7 @@ Add the following to your .vimrc:
 ```viml
 set mouse=a
 call plum#SetBindings()
-let g:Plum_Actions = [
+let g:plum_actions = [
       \ plum#fso#Directory(),
       \ plum#fso#File(),
       \ plum#term#Terminal(),
@@ -57,7 +57,7 @@ Or if you would like to use the smart terminal action:
 " Enable Mouse Bindings
 set mouse=a
 call plum#SetBindings()
-let g:Plum_Actions = [
+let g:plum_actions = [
       \ plum#fso#Directory(),
       \ plum#fso#File(),
       \ plum#term#SmartTerminal(),

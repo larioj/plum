@@ -2,8 +2,8 @@ function! plum#core#Plum(...)
   " Define globals if not defined
   let g:Plum_DebugEnabled = get(g:, 'Plum_DebugEnabled', 0)
   let b:Plum_DebugEnabled = get(b:, 'Plum_DebugEnabled', 0)
-  let g:Plum_Actions = get(g:, 'Plum_Actions', plum#defaults#DefaultActions())
-  let b:Plum_Actions = get(b:, 'Plum_Actions', [])
+  let g:plum_actions = get(g:, 'plum_actions', plum#defaults#DefaultActions())
+  let b:plum_actions = get(b:, 'plum_actions', [])
 
   let l:options = call('plum#core#ResolveOptions', a:000)
   if l:options['mode'] ==# 'v'
@@ -14,7 +14,7 @@ function! plum#core#Plum(...)
     let l:options['cfile'] = plum#extensions#GetPath()
   endif
 
-  for l:action in b:Plum_Actions + g:Plum_Actions
+  for l:action in b:plum_actions + g:plum_actions
     if l:action['matcher'](l:options) && !l:action['action'](l:options)
       return
     else
