@@ -24,8 +24,13 @@ Add the following to your .vimrc:
 ```viml
 " Enable Mouse Bindings
 set mouse=a
-runtime plugin/plum.vim
-call Plum_SetRightMouseBindings()
+call plum#SetBindings()
+let g:Plum_Actions = [
+      \ plum#fso#Directory(),
+      \ plum#fso#File(),
+      \ plum#term#Terminal(),
+      \ plum#vim#Execute()
+      \ ]
 ```
 
 ## A Smarter Terminal Action
@@ -37,14 +42,13 @@ this may segfault. Beware :|
 ```viml
 " Enable Mouse Bindings
 set mouse=a
-runtime plugin/plum.vim
-call Plum_SetRightMouseBindings()
-
-" Replace default terminal action with smart terminal action
-" this may cause segfaults on some vims :|
-call Plum_ReplaceNamedAction(
-      \ 'DefaultTerminalAction',
-      \ plum#defaults#SmartTerminalAction())
+call plum#SetBindings()
+let g:Plum_Actions = [
+      \ plum#fso#Directory(),
+      \ plum#fso#File(),
+      \ plum#term#SmartTerminal(),
+      \ plum#vim#Execute()
+      \ ]
 ```
 
 ## TODO
