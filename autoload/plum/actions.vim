@@ -11,9 +11,6 @@ function! plum#actions#DeleteIfEmpty(job, status)
         \ plum#extensions#GetBufferContents())
   if l:contents ==# '' && a:status ==# 0
     q
-  elseif &buftype ==# 'terminal'
-    "set modifiable
-    setlocal buftype=nofile
   endif
 endfunction
 
