@@ -1,0 +1,32 @@
+# Plum
+Workspace:
+  : lcd $HOME/Projects/plum | vsplit
+  : lcd $HOME/.vim/plugged/plum | vsplit
+Commands: |
+  $ git status
+  $ git add .
+  $ git commit -q
+  $ git diff
+  $ git pull
+  $ git push -q
+  $ git checkout master
+  $ git diff master
+  $ git grep
+  $ git checkout -q dirterm
+  $ git checkout -b dirinterm
+  $ git rebase --continue
+  $ git grep shift
+  : PlugInstall
+  : PlugUpdate
+  : qa
+Files: |
+  .gitignore
+  README.md
+  plugin/plum.vim
+  autoload/plum/core.vim
+  autoload/plum/matchers.vim
+  autoload/plum/actions.vim
+  autoload/plum/extensions.vim
+  autoload/plum/util.vim
+  autoload/plum/system.vim
+  autoload/plum/defaults.vim
