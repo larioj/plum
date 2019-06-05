@@ -17,14 +17,19 @@ endfunction
 function! plum#fso#IsFso(context)
   let context = a:context
   let path = plum#fso#GetPath(context)
+  let context.match = plum#fso#ResolveFso(path)
+  return context.match !=# ''
+endfunction
+
+function! plum#fso#ResolveFso(path)
+  let path = a:path
   let paths = plum#fso#AllPaths(path)
   for p in [paths.original, paths.relative_to_file]
     if filereadable(p) || isdirectory(p)
-      let context.match = p
-      return 1
+      return p
     endif
   endfor
-  return 0
+  return ''
 endfunction
 
 function! plum#fso#GetPath(context)
