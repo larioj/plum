@@ -1,18 +1,3 @@
-function! plum#util#DictUnion(base, diff)
-  let l:result = deepcopy(a:base)
-  for l:k in keys(a:diff)
-    let l:result[l:k] = a:diff[l:k]
-  endfor
-  return l:result
-endfunction
-
-function! plum#util#StrAt(str, idx)
-  if a:idx >=# len(a:str)
-    return ""
-  endif
-  return strpart(a:str, a:idx, 1)
-endfunction
-
 function! plum#util#Trim(str)
   let l:s = 0
   while l:s <# len(a:str)

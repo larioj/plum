@@ -7,12 +7,8 @@
     ├── README.md
     ├── autoload
     │   ├── plum
-    │   │   ├── actions.vim
-    │   │   ├── defaults.vim
     │   │   ├── extensions.vim
     │   │   ├── fso.vim
-    │   │   ├── matchers.vim
-    │   │   ├── system.vim
     │   │   ├── term.vim
     │   │   ├── util.vim
     │   │   └── vim.vim
@@ -21,7 +17,11 @@
         ├── dev.md
         └── notes.yaml
 
+## Source
+
 ## Commands
+    $ tree .
+    $ git rm -f autoload/plum/system.vim
     $ git grep plum#core#Plum
     $ git rm -f plugin/plum.vim
     $ git checkout -b simplify_core
@@ -29,3 +29,5 @@
     $ git add .
     $ git commit
     $ git push
+    $ git push --set-upstream origin simplify_core
+    $ git grep plum#matchers

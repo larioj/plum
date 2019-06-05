@@ -1,9 +1,9 @@
 function! plum#Plum(mode, shift, ...)
-  let actions = plum#core#GlobalActions()
-  let context = plum#core#GlobalContext(a:mode, a:shift, a:000)
-  let settings = plum#core#GlobalSettings()
-  let buffer_actions = plum#core#BufferActions()
-  return plum#core#Execute(actions, context, settings, buffer_actions)
+  let actions = plum#GlobalActions()
+  let context = plum#GlobalContext(a:mode, a:shift, a:000)
+  let settings = plum#GlobalSettings()
+  let buffer_actions = plum#BufferActions()
+  return plum#Execute(actions, context, settings, buffer_actions)
 endfunction
 
 function! plum#Execute(actions, context, ...)
