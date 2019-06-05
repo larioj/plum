@@ -1,7 +1,8 @@
+" TODO(larioj): clean up this function
 function! plum#util#Trim(str)
   let l:s = 0
   while l:s <# len(a:str)
-    let l:char = plum#util#StrAt(a:str, l:s)
+    let l:char = strpart(a:str, l:s, 1)
     if l:char ==# " " || l:char == "\t"
       let l:s = l:s + 1
     else
@@ -15,7 +16,7 @@ function! plum#util#Trim(str)
 
   let l:e = len(a:str) - 1
   while l:e >=# 0
-    let l:char = plum#util#StrAt(a:str, l:e)
+    let l:char = strpart(a:str, l:e, 1)
     if l:char ==# " " || l:char == "\t"
       let l:e = l:e - 1
     else

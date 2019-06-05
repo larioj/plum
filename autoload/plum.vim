@@ -1,6 +1,7 @@
 function! plum#Plum(mode, shift, ...)
+  let external_context = get(a:, 1, {})
   let actions = plum#GlobalActions()
-  let context = plum#GlobalContext(a:mode, a:shift, a:000)
+  let context = plum#GlobalContext(a:mode, a:shift, external_context)
   let settings = plum#GlobalSettings()
   let buffer_actions = plum#BufferActions()
   return plum#Execute(actions, context, settings, buffer_actions)
@@ -9,28 +10,37 @@ endfunction
 function! plum#Execute(actions, context, ...)
   let actions = a:actions
   let context = a:context
-  let settings = get(a:, 2, { 'debug' : 0 })
-  let buffer_actions = get(a:, 3, [])
+  let settings = get(a:, 1, { 'debug' : 0 })
+  let buffer_actions = get(a:, 2, [])
+  if settings.debug
+    echo actions
+    echo context
+  endif
   for action in buffer_actions + actions
-    if settings.debug | echom action | endif
+    if settings.debug
+      echo action
+    endif
     let action_matches = 0
     try
       let action_matches = action.matches(context)
     catch /^Vim\%((\a\+)\)\=:E/
       let action_matches = 0
-      echom 'caught exeption in ' . action.name . '.matches'
+      echo 'caught exeption in ' . action.name . '.matches'
     endtry
     if action_matches
-      if settings.debug | echom action.name . ' matches context' | endif
+      if settings.debug
+        echo action.name . ' matches context'
+      endif
       let err = 0
       try
         let err = action.apply(context)
       catch /^Vim\%((\a\+)\)\=:E/
-        let err = 'caught exeption in ' . action.name . '.apply'
+        echo 'caught exeption in ' . action.name . '.apply'
+        let err = "EXEPTION"
       endtry
-      if err !=# 0
-        echom action.name . ' FAILURE: ' . msg
-        echom 'continuing to next action'
+      if type(err) != type(0) || err !=# 0
+        echo action.name . ' FAILURE: ' . err
+        echo 'continuing to next action'
       else
         return
       endif
@@ -39,7 +49,7 @@ function! plum#Execute(actions, context, ...)
 endfunction
 
 function! plum#GlobalContext(mode, shift, ...)
-  let context = get(a:, 2, {})
+  let context = get(a:, 1, {})
   let context.mode = a:mode
   let context.shift = a:shift
   if context.mode ==# 'v'
@@ -51,6 +61,7 @@ function! plum#GlobalContext(mode, shift, ...)
     let context.path  = plum#extensions#GetPath()
     let context.content = context.line
   endif
+  return context
 endfunction
 
 function! plum#GlobalSettings()
@@ -71,8 +82,8 @@ endfunction
 function! plum#CreateAction(name, matches, apply)
     return {
         \ 'name': a:name,
-        \ 'matches' : plum#util#Fun(a:matcher),
-        \ 'apply' : plum#util#Fun(a:action),
+        \ 'matches' : plum#util#Fun(a:matches),
+        \ 'apply' : plum#util#Fun(a:apply),
         \ }
 endfunction
 

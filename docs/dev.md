@@ -25,6 +25,7 @@
     $ git grep plum#core#Plum
     $ git rm -f plugin/plum.vim
     $ git checkout -b simplify_core
+    $ git diff
     $ git status
     $ git add .
     $ git commit

@@ -1,14 +1,14 @@
 function! plum#term#Terminal()
   return plum#CreateAction(
-        \ 'plum#term#Terminal'
-        \ function('plum#term#IsTerminalCommand')
+        \ 'plum#term#Terminal',
+        \ function('plum#term#IsTerminalCommand'),
         \ function('plum#term#ApplyTerminalCommand'))
 endfunction
 
 function! plum#term#SmartTerminal()
   return plum#CreateAction(
-        \ 'plum#term#Terminal'
-        \ function('plum#term#IsTerminalCommand')
+        \ 'plum#term#Terminal',
+        \ function('plum#term#IsTerminalCommand'),
         \ function('plum#term#ApplySmartTerminalCommand'))
 endfunction
 

@@ -1,8 +1,8 @@
 function! plum#vim#Execute()
   return plum#CreateAction(
         \ "plum#vim#Execute",
-        \ function("plum#vim#IsCommand")
-        \ function("plum#vim#ApplyExecute") )
+        \ function("plum#vim#IsCommand"),
+        \ function("plum#vim#ApplyExecute"))
 endfunction
 
 function! plum#vim#IsCommand(context)
