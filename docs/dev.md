@@ -15,8 +15,6 @@
         ├── dev.md
         └── notes.yaml
 
-## Source
-
 ## Commands
     $ tree .
     $ git rm -f autoload/plum/system.vim
@@ -30,3 +28,6 @@
     $ git push
     $ git push --set-upstream origin simplify_core
     $ git grep plum#matchers
+
+## Set Up Git Access Token
+    $ git config credential.helper store
