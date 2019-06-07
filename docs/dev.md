@@ -1,6 +1,4 @@
 # Development
-    : vsplit
-    : split docs/core.md
 
 ## Files
     .
@@ -28,7 +26,7 @@
     $ git diff
     $ git status
     $ git add .
-    $ git commit
+    $ git commit -m "update docs"
     $ git push
     $ git push --set-upstream origin simplify_core
     $ git grep plum#matchers
