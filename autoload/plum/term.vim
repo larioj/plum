@@ -38,7 +38,7 @@ function! plum#term#ApplyTerminalCommand(context)
   let context = a:context
   let command = ['/bin/sh', '-ic', context.match]
   if has('nvim')
-    vsplit enew
+    split enew
     call termopen(command)
   elseif has('terminal')
     let options = { 'curwin' : context.shift }
