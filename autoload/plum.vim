@@ -26,6 +26,7 @@ function! plum#Execute(actions, context, ...)
     catch /^Vim\%((\a\+)\)\=:E/
       let action_matches = 0
       echo 'caught exeption in ' . action.name . '.matches'
+      echo v:exception
     endtry
     if action_matches
       if settings.debug
@@ -36,6 +37,7 @@ function! plum#Execute(actions, context, ...)
         let err = action.apply(context)
       catch /^Vim\%((\a\+)\)\=:E/
         echo 'caught exeption in ' . action.name . '.apply'
+        echo v:exception
         let err = "EXEPTION"
       endtry
       if type(err) != type(0) || err !=# 0

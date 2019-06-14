@@ -50,14 +50,27 @@ endfunction
 
 function! plum#term#ApplySmartTerminalCommand(context)
   let context = a:context
+  let reuse_open_window = !context.shift
+  let command = context.match
   if has('nvim')
-    return plum#term#ApplyTerminalCommand(context)
+    let options = { 'on_exit': function('plum#term#NvimDeleteIfEmpty') }
+    if reuse_open_window
+      let windows = plum#extensions#NvimCommandToWindowNumber()
+      if has_key(windows, command)
+        call plum#extensions#SwitchToWindow(windows[command])
+        enew
+      else
+        split enew
+      endif
+    else
+      split enew
+    endif
+    call termopen(context.match, options)
   elseif has('terminal')
     let options =
           \ { 'exit_cb'   : function('plum#term#DeleteIfEmpty')
           \ , 'term_name' : context.match
           \ }
-    let reuse_open_window = !context.shift
     if reuse_open_window
       let windows = plum#extensions#WindowByName()
       if has_key(windows, context.match)
@@ -73,6 +86,9 @@ function! plum#term#ApplySmartTerminalCommand(context)
 endfunction
 
 function! plum#term#DeleteIfEmpty(job, status)
+  if a:status !=# 0
+    return
+  endif
   call term_wait(expand('%'), 1000)
   call term_wait(expand('%'), 1000)
   call term_wait(expand('%'), 1000)
@@ -84,6 +100,13 @@ function! plum#term#DeleteIfEmpty(job, status)
   endif
 endfunction
 
-function! plum#term#DeleteIfEmptyNvim(job, status)
-  
+function! plum#term#NvimDeleteIfEmpty(id, exit_code, event_type)
+  let id = a:id
+  let exit_code = a:exit_code
+  let contents = trim(plum#extensions#GetBufferContents())
+  if contents ==# ''
+    quit
+  endif
+  let msg = '[Process exited ' . exit_code . ']'
+  echo msg
 endfunction
