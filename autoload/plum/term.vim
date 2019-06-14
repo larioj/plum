@@ -39,7 +39,7 @@ function! plum#term#ApplyTerminalCommand(context)
   let command = ['/bin/sh', '-ic', context.match]
   if has('nvim')
     split enew
-    call termopen(command)
+    call termopen(context.match)
   elseif has('terminal')
     let options = { 'curwin' : context.shift }
     call term_start(command, options)
@@ -49,24 +49,27 @@ function! plum#term#ApplyTerminalCommand(context)
 endfunction
 
 function! plum#term#ApplySmartTerminalCommand(context)
-  if !has('terminal')
+  let context = a:context
+  if has('nvim')
+    return 'nvim not supported yet'
+  elseif has('terminal')
+    let options =
+          \ { 'exit_cb'   : function('plum#term#DeleteIfEmpty')
+          \ , 'term_name' : context.match
+          \ }
+    let reuse_open_window = !context.shift
+    if reuse_open_window
+      let windows = plum#extensions#WindowByName()
+      if has_key(windows, context.match)
+        call plum#extensions#SwitchToWindow(windows[context.match])
+        let options.curwin = 1
+      endif
+    endif
+    let command = ['/bin/sh', '-ic', context.match]
+    call term_start(command, options)
+  else
     return 'this version of vim does not support terminal'
   endif
-  let context = a:context
-  let options =
-        \ { 'exit_cb'   : function('plum#term#DeleteIfEmpty')
-        \ , 'term_name' : context.match
-        \ }
-  let reuse_open_window = !context.shift
-  if reuse_open_window
-    let windows = plum#extensions#WindowByName()
-    if has_key(windows, context.match)
-      call plum#extensions#SwitchToWindow(windows[context.match])
-      let options.curwin = 1
-    endif
-  endif
-  let command = ['/bin/sh', '-ic', context.match]
-  call term_start(command, options)
 endfunction
 
 function! plum#term#DeleteIfEmpty(job, status)
@@ -79,4 +82,8 @@ function! plum#term#DeleteIfEmpty(job, status)
   if l:contents ==# '' && a:status ==# 0
     quit
   endif
+endfunction
+
+function! plum#term#DeleteIfEmptyNvim(job, status)
+  
 endfunction
