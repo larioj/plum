@@ -26,5 +26,7 @@ let g:plum_actions = [
       \ ]
 ```
 
+Note that vim8 or neovim is required for the terminal actions.
+
 ## Extension Plugins
 * [plum-tree](https://github.com/larioj/plum-tree)
