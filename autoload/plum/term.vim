@@ -51,7 +51,7 @@ endfunction
 function! plum#term#ApplySmartTerminalCommand(context)
   let context = a:context
   if has('nvim')
-    return plum#term#ApplySmartTerminalCommand(context)
+    return plum#term#ApplyTerminalCommand(context)
   elseif has('terminal')
     let options =
           \ { 'exit_cb'   : function('plum#term#DeleteIfEmpty')
