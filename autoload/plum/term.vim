@@ -39,9 +39,14 @@ function! plum#term#ApplyTerminalCommand(context)
     return 'this version of vim does not support terminal'
   endif
   let context = a:context
-  let options = { 'curwin' : context.shift }
   let command = ['/bin/sh', '-ic', context.match]
-  call term_start(command, options)
+  if has('nvim')
+    vsplit enew
+    call termopen(command)
+  else
+    let options = { 'curwin' : context.shift }
+    call term_start(command, options)
+  endif
 endfunction
 
 function! plum#term#ApplySmartTerminalCommand(context)
