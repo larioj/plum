@@ -101,6 +101,11 @@ function! plum#term#DeleteIfEmpty(job, status)
 endfunction
 
 function! plum#term#NvimDeleteIfEmpty(id, exit_code, event_type)
+  let term_prefix = 'term://'
+  let name = expand('%')
+  if strpart(name, 0, len(term_prefix)) !=# term_prefix
+    return
+  endif
   let id = a:id
   let exit_code = a:exit_code
   let contents = trim(plum#extensions#GetBufferContents())
