@@ -12,7 +12,6 @@ function! plum#fso#ApplyOpenFso(context)
   else
     execute 'below split ' . context.match
   endif
-  echo context
   if has_key(context, 'address')
     let address = context.address
     if address.type ==# 'LineNumber'
