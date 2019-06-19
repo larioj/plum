@@ -15,6 +15,8 @@ editor's middle click and right click functionality.
 ## Installation Instructions
 Install using Vundle or Pathogen
 
+Note that vim8 or neovim is required for the terminal actions.
+
 ## Recomended Configuration In .vimrc
 ```viml
 set mouse=a
@@ -26,7 +28,16 @@ let g:plum_actions = [
       \ ]
 ```
 
-Note that vim8 or neovim is required for the terminal actions.
+## Don't ant to use the mouse?
+```viml
+let g:plum_actions = [
+      \ plum#term#SmartTerminal(),
+      \ plum#vim#Execute(),
+      \ plum#fso#OpenFso(),
+      \ ]
+" bind the plum to ,
+nnoremap , :call plum#Plum('n', 0)
+```
 
 ## Extension Plugins
 * [plum-tree](https://github.com/larioj/plum-tree)
