@@ -36,7 +36,7 @@ let g:plum_actions = [
       \ plum#fso#OpenFso(),
       \ ]
 " bind the plum to ,
-nnoremap , :call plum#Plum('n', 0)
+nnoremap , :call plum#Plum('n', 0)<cr>
 ```
 
 ## Extension Plugins
