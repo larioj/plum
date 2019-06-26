@@ -89,10 +89,7 @@ function! plum#term#DeleteIfEmpty(job, status)
   if a:status !=# 0
     return
   endif
-  call term_wait(expand('%'), 1000)
-  call term_wait(expand('%'), 1000)
-  call term_wait(expand('%'), 1000)
-  call term_wait(expand('%'), 1000)
+  call term_wait(bufnr('%'), 1000)
   let l:contents = plum#util#Trim(
         \ plum#extensions#GetBufferContents())
   if l:contents ==# '' && a:status ==# 0
