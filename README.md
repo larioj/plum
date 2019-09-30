@@ -28,7 +28,7 @@ let g:plum_actions = [
       \ ]
 ```
 
-## Don't ant to use the mouse?
+## Don't want to use the mouse?
 ```viml
 let g:plum_actions = [
       \ plum#term#SmartTerminal(),

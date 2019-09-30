@@ -79,7 +79,7 @@ function! plum#term#ApplySmartTerminalCommand(context)
       endif
     endif
     let command = ['/bin/sh', '-ic', context.match]
-    call term_start(command, options)
+    below call term_start(command, options)
   else
     return 'this version of vim does not support terminal'
   endif

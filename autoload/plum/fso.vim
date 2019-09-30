@@ -10,7 +10,7 @@ function! plum#fso#ApplyOpenFso(context)
   if context.shift
     execute 'tabe ' . context.match
   else
-    execute 'below split ' . context.match
+    execute 'split ' . context.match
   endif
   if has_key(context, 'address')
     let address = context.address
