@@ -9,7 +9,6 @@
     ├── README.md
     ├── autoload
     │   ├── plum
-    │   │   ├── extensions.vim
     │   │   ├── fso.vim
     │   │   ├── term.vim
     │   │   ├── util.vim
