@@ -1,20 +1,55 @@
 function! plum#term#Terminal()
-  return [ { c, _ -> plum#term#Extract(c) }
+  return [ { c, _ -> plum#term#Extract() }
         \, { c, _ -> plum#term#Act(c) } ]
 endfunction
 
-function! plum#term#Extract(content)
-  let content = a:content
+function! plum#term#Extract()
+  let content = plum#util#visualorline()
+
+  " get indentation
+  let size = 0
+  let indentation = ''
+  while trim(indentation) ==# ''
+    let size += 1
+    let indentation = strpart(content, 0, size)
+  endwhile
+  let size -= 1
+  let indentation = strpart(indentation, 0, size)
+
+  " check if matches pattern
+  let content = strpart(content, size)
   if content[0:1] !=# '$ '
     return ['', v:false]
   endif
+
   let lnum = line('.')
   let lines = [content[2:]]
-  while lines[-1][-1:] ==# '\' && mode(1) !=# 'v'
+
+  " get multiline command
+  while lines[-1][-1:] ==# '\'
+    let lines[-1] = trim(strpart(lines[-1], 0, len(lines[-1]) - 1))
     let lnum += 1
     let lines = lines + [getline(lnum)]
+    if lines[-1] =~# ('^' . indentation)
+      let lines[-1] = trim(strpart(lines[-1], size))
+    endif
   endwhile
-  return [join(lines, '\n'), v:true]
+  let lines = [join(lines, ' ')]
+
+  " get heredoc
+  if  lines[-1] =~# '<<EOF' || lines[-1] =~# "<<'EOF'"
+    while trim(lines[-1]) !=# 'EOF' && lnum < line('$')
+      let lnum += 1
+      let lines = lines + [getline(lnum)]
+      if lines[-1] =~# ('^' . indentation)
+        let lines[-1] = strpart(lines[-1], size)
+      else " malformed heredoc
+        return ['', v:false]
+      endif
+    endwhile
+  endif
+
+  return [join(lines, "\n"), v:true]
 endfunction
 
 function! plum#term#Act(exp)
@@ -51,7 +86,7 @@ endfunction
 
 function! s:DeleteIfEmpty(status)
   call term_wait('', 100)
-  if trim(join(getline(1, '$'), '\n')) ==# '' && a:status ==# 0
+  if trim(join(getline(1, '$'), "\n")) ==# '' && a:status ==# 0
     close
   endif
 endfunction

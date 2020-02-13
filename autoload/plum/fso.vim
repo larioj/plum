@@ -5,6 +5,10 @@ endfunction
 
 function! plum#fso#Act(path, new_tab)
   let path = a:path
+  if isdirectory(path[0])
+    lcd path[0]
+    return
+  endif
   let location = 'split '
   if a:new_tab
     let location = 'tabe '

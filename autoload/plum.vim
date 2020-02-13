@@ -2,7 +2,7 @@ function! plum#Plum(...)
   let trigger = get(a:, 1, '')
   let actions = get(g:, 'plum_actions', [])
   let b_actions = get(b:, 'plum_actions', [])
-  let content = trim(plum#util#visualorline())
+  let content = plum#util#visualorline()
   for [Extract, Act] in b_actions + actions
     let [text, is_match] = Extract(content, trigger)
     if is_match
