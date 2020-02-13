@@ -1,114 +1,60 @@
 function! plum#term#Terminal()
-  return plum#CreateAction(
-        \ 'plum#term#Terminal',
-        \ function('plum#term#IsTerminalCommand'),
-        \ function('plum#term#ApplyTerminalCommand'))
+  return [ { c, _ -> plum#term#Extract(c) }
+        \, { c, _ -> plum#term#Act(c) } ]
 endfunction
 
-function! plum#term#SmartTerminal()
-  return plum#CreateAction(
-        \ 'plum#term#Terminal',
-        \ function('plum#term#IsTerminalCommand'),
-        \ function('plum#term#ApplySmartTerminalCommand'))
-endfunction
-
-function! plum#term#IsTerminalCommand(context)
-  let context = a:context
-  let content = plum#util#Trim(context.content)
-  if strpart(content, 0, 2) !=# '$ '
-    return 0
+function! plum#term#Extract(content)
+  let content = a:content
+  if content[0:1] !=# '$ '
+    return ['', v:false]
   endif
-  " capture escaped line endings
-  if context.mode ==# 'n' || context.mode ==# 'i'
-    let lnum = line('.')
-    let curline = content
-    let lines = [curline]
-    while curline[-1:] ==# '\'
-      let lnum += 1
-      let curline = getline(lnum)
-      let lines = lines + [curline]
+  let lnum = line('.')
+  let lines = [content[2:]]
+  while lines[-1][-1:] ==# '\' && mode(1) !=# 'v'
+    let lnum += 1
+    let lines = lines + [getline(lnum)]
+  endwhile
+  return [join(lines, '\n'), v:true]
+endfunction
+
+function! plum#term#Act(exp)
+  if !has('terminal')
+    echom 'This action requries vim +terminal'
+    return
+  endif
+  let exp = a:exp
+  let windows = {}
+  for i in range(1, winnr('$'))
+    windows[bufname(winbufnr(i))] = i
+  endfor
+  if has_key(windows, exp)
+    execute windows[exp] . 'wincmd w'
+  else
+    let last = 0
+    let cur = winnr()
+    while last !=# cur
+      wincmd j
+      last = cur
+      cur = winnr()
     endwhile
-    let content = join(lines, "\n")
+    belowright new
   endif
-  let context.match = strpart(content, 2)
-  return 1
+  let options =
+        \ { 'exit_cb': { _, status -> s:DeleteIfEmpty(status) }
+        \ , 'term_name': exp
+        \ , 'curwin': 1
+        \ , 'term_finish': 'open'
+        \ }
+  let command = ['/bin/sh', '-ic', exp]
+  call term_start(command, options)
 endfunction
 
-function! plum#term#ApplyTerminalCommand(context)
-  let context = a:context
-  let command = ['/bin/sh', '-ic', context.match]
-  if has('nvim')
-    split enew
-    call termopen(context.match)
-  elseif has('terminal')
-    let options = { 'curwin' : context.shift }
-    call term_start(command, options)
-  else
-    return 'this version of vim does not support terminal'
-  endif
-endfunction
-
-function! plum#term#ApplySmartTerminalCommand(context)
-  let context = a:context
-  let reuse_open_window = !context.shift
-  let command = context.match
-  if has('nvim')
-    let options = { 'on_exit': function('plum#term#NvimDeleteIfEmpty') }
-    if reuse_open_window
-      let windows = plum#extensions#NvimCommandToWindowNumber()
-      if has_key(windows, command)
-        call plum#extensions#SwitchToWindow(windows[command])
-        enew
-      else
-        split enew
-      endif
-    else
-      split enew
-    endif
-    call termopen(context.match, options)
-  elseif has('terminal')
-    let options =
-          \ { 'exit_cb'   : function('plum#term#DeleteIfEmpty')
-          \ , 'term_name' : context.match
-          \ }
-    if reuse_open_window
-      let windows = plum#extensions#WindowByName()
-      if has_key(windows, context.match)
-        call plum#extensions#SwitchToWindow(windows[context.match])
-        let options.curwin = 1
-      endif
-    endif
-    let command = ['/bin/sh', '-ic', context.match]
-    below call term_start(command, options)
-  else
-    return 'this version of vim does not support terminal'
-  endif
-endfunction
-
-function! plum#term#DeleteIfEmpty(job, status)
+function! s:DeleteIfEmpty(status)
+  call term_wait(winbufnr(0), 1000)
   if a:status !=# 0
     return
   endif
-  call term_wait(bufnr('%'), 1000)
-  let l:contents = plum#util#Trim(
-        \ plum#extensions#GetBufferContents())
-  if l:contents ==# '' && a:status ==# 0
+  if trim(join(getline(1, '$'), '\n')) ==# ''
     quit
   endif
-endfunction
-
-function! plum#term#NvimDeleteIfEmpty(id, exit_code, event_type)
-  let term_prefix = 'term://'
-  let name = expand('%')
-  if strpart(name, 0, len(term_prefix)) !=# term_prefix
-    return
-  endif
-  let id = a:id
-  let exit_code = a:exit_code
-  let contents = trim(plum#extensions#GetBufferContents())
-  if contents ==# ''
-    quit
-  endif
-  let msg = '[Process exited ' . exit_code . ']'
-  echo msg
 endfunction

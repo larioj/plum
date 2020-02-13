@@ -30,3 +30,6 @@ Set when mode in ['i', 'n']. Contain line under cursor.
 
 ### context.path
 Set when mode in ['i', 'n']. Contain path under cursor.
+
+## Dev
+* docs/lambdas.md

@@ -1,34 +1,22 @@
-" TODO(larioj): clean up this function
-function! plum#util#Trim(str)
-  let l:s = 0
-  while l:s <# len(a:str)
-    let l:char = strpart(a:str, l:s, 1)
-    if l:char ==# " " || l:char == "\t"
-      let l:s = l:s + 1
-    else
-      break
-    endif
-  endwhile
-
-  if l:s ==# len(a:str)
-    return ""
+function! plum#util#visual()
+  if mode(1) !=# 'v'
+    return ''
   endif
-
-  let l:e = len(a:str) - 1
-  while l:e >=# 0
-    let l:char = strpart(a:str, l:e, 1)
-    if l:char ==# " " || l:char == "\t"
-      let l:e = l:e - 1
-    else
-      break
-    endif
-  endwhile
-  return a:str[l:s : l:e]
+  let [line_start, column_start] = getpos("'<")[1:2]
+  let [line_end, column_end] = getpos("'>")[1:2]
+  let lines = getline(line_start, line_end)
+  if len(lines) == 0
+      return ''
+  endif
+  let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
+  let lines[0] = lines[0][column_start - 1:]
+  return join(lines, '\n')
 endfunction
 
-function! plum#util#Fun(str_or_fun)
-  if type(a:str_or_fun) ==# type("")
-    return function(a:str_or_fun)
+function! plum#util#visualorline()
+  let r = plum#util#visual()
+  if r ==# ''
+    r = getline('.')
   endif
-  return a:str_or_fun
+  return r
 endfunction
