@@ -1,6 +1,6 @@
 function! plum#fso#OpenFso()
-  return [ { _, _ -> plum#fso#Extract() }
-        \, { p, i -> plum#fso#Act(p, i[0] ==# 'S') } ]
+  return [ { a, b -> plum#fso#Extract() }
+        \, { p, i -> plum#fso#Act(p, i[0:0] ==# 'S') } ]
 endfunction
 
 function! plum#fso#Act(path, new_tab)
@@ -13,8 +13,7 @@ function! plum#fso#Act(path, new_tab)
   if len(path) > 1
     let parts = split(path[1], ',')
     if len(path) == 2
-      let [start, end] = parts
-      call s:vselect(start,end)
+      call plum#fso#vselect(parts[0], parts[1])
     else
       execute parts[0]
     endif
@@ -22,14 +21,14 @@ function! plum#fso#Act(path, new_tab)
 endfunction
 
 function! plum#fso#Extract()
-  let paths = filter(s:paths(), { p -> filereadable(p[0]) || isdirectory(p[0]) })
+  let paths = filter(plum#fso#paths(), { _, p -> filereadable(p[0]) || isdirectory(p[0]) })
   if len(paths) ==# 0
     return ['', v:false]
   endif
   return [paths[0], v:true]
 endfunction
 
-function! s:vselect(start, end)
+function! plum#fso#vselect(start, end)
   let [start, end] = [a:start, a:end]
   call cursor(start, 0)
   execute 'normal! v'
@@ -37,8 +36,8 @@ function! s:vselect(start, end)
   execute 'normal! $'
 endfunction
 
-function! s:paths()
-  let original = s:path()
+function! plum#fso#paths()
+  let original = plum#fso#path()
   let paths = [original]
   if trim(original[0][0:0]) != '/'
     let relf = copy(original)
@@ -49,7 +48,7 @@ function! s:paths()
   return paths
 endfunction
 
-function! s:path()
+function! plum#fso#path()
   let p = plum#util#visual()
   if p != ''
     return p

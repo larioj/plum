@@ -1,5 +1,9 @@
 # Development
 
+* autoload/plum.vim
+* autoload/plum/vim.vim
+* autoload/plum/term.vim
+
 ## Files
     .
     ├── README.md
@@ -33,3 +37,8 @@ Set when mode in ['i', 'n']. Contain path under cursor.
 
 ## Dev
 * docs/lambdas.md
+: echo "hll"
+$ echo hello 
+$ echo
+
+

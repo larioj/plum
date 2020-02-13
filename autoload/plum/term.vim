@@ -25,7 +25,7 @@ function! plum#term#Act(exp)
   let exp = a:exp
   let windows = {}
   for i in range(1, winnr('$'))
-    windows[bufname(winbufnr(i))] = i
+    let windows[bufname(winbufnr(i))] = i
   endfor
   if has_key(windows, exp)
     execute windows[exp] . 'wincmd w'
@@ -34,8 +34,8 @@ function! plum#term#Act(exp)
     let cur = winnr()
     while last !=# cur
       wincmd j
-      last = cur
-      cur = winnr()
+      let last = cur
+      let cur = winnr()
     endwhile
     belowright new
   endif
@@ -50,11 +50,8 @@ function! plum#term#Act(exp)
 endfunction
 
 function! s:DeleteIfEmpty(status)
-  call term_wait(winbufnr(0), 1000)
-  if a:status !=# 0
-    return
-  endif
-  if trim(join(getline(1, '$'), '\n')) ==# ''
-    quit
+  call term_wait('', 100)
+  if trim(join(getline(1, '$'), '\n')) ==# '' && a:status ==# 0
+    close
   endif
 endfunction

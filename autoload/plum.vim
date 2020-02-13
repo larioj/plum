@@ -3,10 +3,10 @@ function! plum#Plum(...)
   let actions = get(g:, 'plum_actions', [])
   let b_actions = get(b:, 'plum_actions', [])
   let content = s:modify(trim(plum#util#visualorline()))
-  for [extract, act] in b_actions + actions
-    let [text, is_match] = extract(content, trigger)
+  for [Extract, Act] in b_actions + actions
+    let [text, is_match] = Extract(content, trigger)
     if is_match
-      act(text, trigger)
+      call Act(text, trigger)
       break
     endif
   endfor
@@ -16,8 +16,8 @@ function! s:modify(text)
   let mods = get(g:, 'plum_mods', [])
   let b_mods = get(b:, 'plum_mods', [])
   let r = a:text
-  for m in b_mods + mods
-    r = m(copy(r))
+  for Modify in b_mods + mods
+    r = Modify(copy(r))
   endfor
   return r
 endfunction

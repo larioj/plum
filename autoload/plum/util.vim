@@ -16,7 +16,7 @@ endfunction
 function! plum#util#visualorline()
   let r = plum#util#visual()
   if r ==# ''
-    r = getline('.')
+    let r = getline('.')
   endif
   return r
 endfunction

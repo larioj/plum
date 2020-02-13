@@ -17,5 +17,3 @@
 
 ## Configuration
 * ~/.vimrc
-
-
