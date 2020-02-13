@@ -2,7 +2,7 @@ function! plum#Plum(...)
   let trigger = get(a:, 1, '')
   let actions = get(g:, 'plum_actions', [])
   let b_actions = get(b:, 'plum_actions', [])
-  let content = s:modify(trim(plum#util#visualorline()))
+  let content = trim(plum#util#visualorline())
   for [Extract, Act] in b_actions + actions
     let [text, is_match] = Extract(content, trigger)
     if is_match
@@ -10,16 +10,6 @@ function! plum#Plum(...)
       break
     endif
   endfor
-endfunction
-
-function! s:modify(text)
-  let mods = get(g:, 'plum_mods', [])
-  let b_mods = get(b:, 'plum_mods', [])
-  let r = a:text
-  for Modify in b_mods + mods
-    r = Modify(copy(r))
-  endfor
-  return r
 endfunction
 
 function! plum#SetMouseBindings()
