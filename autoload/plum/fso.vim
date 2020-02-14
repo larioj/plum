@@ -1,5 +1,5 @@
 function! plum#fso#OpenFso()
-  return [ { a, b -> plum#fso#Extract() }
+  return [ { a, b -> plum#fso#bestpath(plum#fso#path()) }
         \, { p, i -> plum#fso#Act(p, i[0:0] ==# 'S') } ]
 endfunction
 
@@ -24,8 +24,9 @@ function! plum#fso#Act(path, new_tab)
   endif
 endfunction
 
-function! plum#fso#Extract()
-  let paths = filter(plum#fso#paths(), { _, p -> filereadable(p[0]) || isdirectory(p[0]) })
+function! plum#fso#bestpath(original)
+  let paths = filter(plum#fso#paths(a:original),
+        \ { _, p -> filereadable(p[0]) || isdirectory(p[0]) })
   if len(paths) ==# 0
     return ['', v:false]
   endif
@@ -40,8 +41,8 @@ function! plum#fso#vselect(start, end)
   execute 'normal! $'
 endfunction
 
-function! plum#fso#paths()
-  let original = plum#fso#path()
+function! plum#fso#paths(original)
+  let original = a:original
   let paths = [original]
   if trim(original[0][0:0]) != '/'
     let relf = copy(original)
