@@ -16,7 +16,7 @@ function! plum#fso#Act(path, new_tab)
   execute location . path[0]
   if len(path) > 1
     let parts = split(path[1], ',')
-    if len(path) == 2
+    if len(parts) == 2
       call plum#fso#vselect(parts[0], parts[1])
     else
       execute parts[0]
@@ -60,7 +60,7 @@ function! plum#fso#path()
   endif
   let old = &isfname
   set isfname+=58 " allow ':'
-  let p = expand('<cfile>')
+  let p = expand(expand('<cfile>'))
   let &isfname = old
   return split(p, ':')
 endfunction
