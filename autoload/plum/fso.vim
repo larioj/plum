@@ -1,6 +1,6 @@
 function! plum#fso#OpenFso()
   return [ { a, b -> plum#fso#bestpath(plum#fso#path()) }
-        \, { p, i -> plum#fso#Act(p, i[0:0] ==# 'S') } ]
+        \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
 function! plum#fso#Act(path, new_tab)

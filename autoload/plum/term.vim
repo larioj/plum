@@ -1,3 +1,7 @@
+function! plum#term#SmartTerminal()
+  return plum#term#Terminal()
+endfunction
+
 function! plum#term#Terminal()
   return [ { c, _ -> plum#term#Extract() }
         \, { c, _ -> plum#term#Act(c) } ]

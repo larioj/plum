@@ -1,5 +1,5 @@
 function! plum#util#visual()
-  if mode(1) !=# 'v'
+  if get(b:, 'plum_trigger_mode', '') !=# 'v'
     return ''
   endif
   let [line_start, column_start] = getpos("'<")[1:2]

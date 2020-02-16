@@ -1,6 +1,6 @@
 function! plum#tree#OpenFso()
   return [ { a, b -> plum#fso#bestpath([s:TreePathUnderCursor()]) }
-        \, { p, i -> plum#fso#Act(p, i[0:0] ==# 'S') } ]
+        \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
 function! s:TreePathUnderCursor()
