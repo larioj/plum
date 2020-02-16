@@ -11,6 +11,8 @@
 
 ## Examples
 
-: echo "hello" . "foo"
-$ echo foo bar
+: echo "hello\n" . "foo"
+$ echo "foo\n" bar
 $ git grep trigger
+$ echo hello && sleep 5
+$ sleep 8

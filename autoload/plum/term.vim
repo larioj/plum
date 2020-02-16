@@ -57,17 +57,18 @@ function! plum#term#Extract()
 endfunction
 
 function! plum#term#Act(exp)
+  let exp = a:exp
   if !has('terminal')
     echom 'This action requries vim +terminal'
     return
   endif
-  let exp = a:exp
   let windows = {}
   for i in range(1, winnr('$'))
     let windows[bufname(winbufnr(i))] = i
   endfor
-  if has_key(windows, exp)
+  if has_key(windows, exp) && s:is_finised(windows[exp])
     execute windows[exp] . 'wincmd w'
+    enew
   else
     let last = 0
     let cur = winnr()
@@ -78,8 +79,11 @@ function! plum#term#Act(exp)
     endwhile
     belowright new
   endif
+  let buf = bufnr()
+  let win = win_getid()
+  echom 'created buf:' . buf . ' win:' . win
   let options =
-        \ { 'exit_cb': { _, status -> s:DeleteIfEmpty(status) }
+        \ { 'exit_cb': { _, status -> s:DeleteIfEmpty(buf, win, status) }
         \ , 'term_name': exp
         \ , 'curwin': 1
         \ , 'term_finish': 'open'
@@ -88,9 +92,21 @@ function! plum#term#Act(exp)
   call term_start(command, options)
 endfunction
 
-function! s:DeleteIfEmpty(status)
-  call term_wait('', 100)
-  if trim(join(getline(1, '$'), "\n")) ==# '' && a:status ==# 0
-    close
+function! s:is_finised(win)
+  let buf = winbufnr(a:win)
+  return term_getstatus(buf) == 'finished'
+endfunction
+
+function! s:DeleteIfEmpty(buf, win, status)
+  let [buf, win, status] = [a:buf, a:win, a:status]
+  call term_wait(buf, 1000)
+  let lines = []
+  for i in range(1, line('$', win))
+    call add(lines, term_getline(buf, i))
+  endfor
+  echom 'checking buf:' . buf . ' win:' . win
+  if trim(join(lines, "\n")) ==# '' && status ==# 0
+    echom 'deleting buf:' . buf . ' win:' . win
+    exe buf 'bwipe!'
   endif
 endfunction
