@@ -1,43 +1,50 @@
 # Plum
-Right click on text to execute an action. The action that executes is dependent
-on the text clicked.
-
-## History
-This plugin was inspired by [Acme](https://9fans.github.io/plan9port/man/man1/acme.html)
-editor's middle click and right click functionality.
+Execute action based upon the content under cursor.
 
 ## Demo
-<a href="https://cl.ly/0a0C1S263C3Q" target="_blank">
-  <img src="https://drh2acu5z204m.cloudfront.net/items/0A1E1l2q412U1c1C062n/Screen%20Recording%202018-08-19%20at%2008.36%20PM.gif"
-       style="display: block;height: auto;width: 100%;"/>
-</a>
+
+    # lines starting with ': ' are treated as vim expressions
+    : echo 'hello'
+
+    # lines starting with '$ ' are treated as terminal expressions
+    $ echo hello
+
+    # you can execute muliline expressions
+    $ echo \
+        hello
+
+    # you can execute heredocs
+    $ cat <<EOF
+      hey there
+    EOF
+
+    $HOME/.vimrc
 
 ## Installation Instructions
 Install using Vundle or Pathogen
 
-Note that vim8 or neovim is required for the terminal actions.
+Note that vim8 is required for the terminal actions.
 
 ## Recomended Configuration In .vimrc
 ```viml
 set mouse=a
 call plum#SetMouseBindings()
+nnoremap , :call plum#Plum()<cr>
 let g:plum_actions = [
-      \ plum#term#SmartTerminal(),
+      \ plum#term#Terminal(),
       \ plum#vim#Execute(),
+      \ plum#tree#OpenFso(),
       \ plum#fso#OpenFso(),
       \ ]
 ```
 
 ## Don't want to use the mouse?
 ```viml
+nnoremap , :call plum#Plum()<cr>
 let g:plum_actions = [
-      \ plum#term#SmartTerminal(),
+      \ plum#term#Terminal(),
       \ plum#vim#Execute(),
+      \ plum#tree#OpenFso(),
       \ plum#fso#OpenFso(),
       \ ]
-" bind the plum to ,
-nnoremap , :call plum#Plum('n', 0)<cr>
 ```
-
-## Extension Plugins
-* [plum-tree](https://github.com/larioj/plum-tree)

@@ -1,113 +1,62 @@
 function! plum#fso#OpenFso()
-  return plum#CreateAction(
-        \ 'plum#fso#OpenFso',
-        \ function('plum#fso#IsFso'),
-        \ function('plum#fso#ApplyOpenFso'))
+  return [ { a, b -> plum#fso#bestpath(plum#fso#path()) }
+        \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
-function! plum#fso#ApplyOpenFso(context)
-  let context = a:context
-  if context.shift
-    execute 'tabe ' . context.match
-  else
-    execute 'split ' . context.match
+function! plum#fso#Act(path, new_tab)
+  let path = a:path
+  if isdirectory(path[0])
+    lcd path[0]
+    return
   endif
-  if has_key(context, 'address')
-    let address = context.address
-    if address.type ==# 'LineNumber'
-      execute address.line
-    elseif address.type ==# 'Range'
-      call cursor(address.start, 0)
-      execute 'normal! v'
-      call cursor(address.end, 0)
-      execute 'normal! $'
+  let location = 'split '
+  if a:new_tab
+    let location = 'tabe '
+  endif
+  execute location . path[0]
+  if len(path) > 1
+    let parts = split(path[1], ',')
+    if len(parts) == 2
+      call plum#fso#vselect(parts[0], parts[1])
+    else
+      execute parts[0]
     endif
   endif
 endfunction
 
-function! plum#fso#IsFso(context)
-  let context = a:context
-  let path = plum#fso#GetPath(context)
-  let address = plum#fso#GetAddress(context.mode)
-  let context.match = plum#fso#ResolveFso(path)
-  let address.path = context.match
-  let context.address = address
-  return context.match !=# ''
-endfunction
-
-function! plum#fso#ResolveFso(path)
-  let path = a:path
-  let paths = plum#fso#AllPaths(path)
-  for p in [paths.original, paths.relative_to_file]
-    if filereadable(p) || isdirectory(p)
-      return p
-    endif
-  endfor
-  return ''
-endfunction
-
-function! plum#fso#GetPath(context)
-  let context = a:context
-  let path = context.content
-  if context.mode ==# 'n' || context.mode ==# 'i'
-    let path = context.path
+function! plum#fso#bestpath(original)
+  let paths = filter(plum#fso#paths(a:original),
+        \ { _, p -> filereadable(p[0]) || isdirectory(p[0]) })
+  if len(paths) ==# 0
+    return ['', v:false]
   endif
-  return path
+  return [paths[0], v:true]
 endfunction
 
-function! plum#fso#GetAddress(mode)
-  let mode = a:mode
-  if mode ==# 'v'
-    return plum#fso#ParseAddress(trim(
-          \ plum#extensions#GetVisualSelection()))
-  elseif mode ==# 'n' || mode ==# 'i'
-    let path = expand('<cfile>')
-    let olda = @a
-    execute 'normal! "ay$'
-    let ctoe = @a
-    let @a = olda
-    let address = plum#fso#ParseAddress(ctoe)
-    if address.type !=# 'NotAddress'
-      let address.path = path
-    endif
-    return address
-  else
-    return { 'type' : 'NotAddress' }
+function! plum#fso#vselect(start, end)
+  let [start, end] = [a:start, a:end]
+  call cursor(start, 0)
+  execute 'normal! v'
+  call cursor(end, 0)
+  execute 'normal! $'
+endfunction
+
+function! plum#fso#paths(original)
+  let original = a:original
+  let paths = [original]
+  if trim(original[0][0:0]) != '/'
+    let relf = copy(original)
+    let file_dir = expand('%:p:h')
+    let relf[0] = simplify(file_dir . '/' . relf[0])
+    call add(paths, relf)
   endif
+  return paths
 endfunction
 
-function! plum#fso#ParseAddress(path)
-  let path = a:path
-  let haspathonly = '\v(\f+)'
-  let haslinenumonly = '\v(\f+):(\d+)'
-  let hasrange = '\v(\f+):(\d+),(\d+)'
-  let address = { 'type' : 'NotAddress' }
-  if match(path, hasrange) ==# 0
-    let matchgroups = matchlist(path, hasrange)
-    let address = { 'type' : 'Range' }
-    let address.path = matchgroups[1]
-    let address.start = matchgroups[2]
-    let address.end = matchgroups[3]
-  elseif match(path, haslinenumonly) ==# 0
-    let matchgroups = matchlist(path, haslinenumonly)
-    let address = { 'type' : 'LineNumber' }
-    let address.path = matchgroups[1]
-    let address.line = matchgroups[2]
-  elseif match(path, haspathonly) ==# 0
-    let matchgroups = matchlist(path, haspathonly)
-    let address = { 'type' : 'PathOnly' }
-    let address.path = matchgroups[1]
+function! plum#fso#path()
+  let p = plum#util#visual()
+  if p != ''
+    return p
   endif
-  return address
-endfunction
-
-function! plum#fso#AllPaths(path)
-  let path = a:path
-  let file_dir = expand('%:p:h')
-  " TODO(larioj): Figure out a way to handle abs paths
-  let relative_to_file = simplify(file_dir . '/' . path)
-  return {
-        \ 'original' : path,
-        \ 'relative_to_file' : relative_to_file
-        \ }
+  return split(plum#util#path(), ':')
 endfunction

@@ -1,32 +1,27 @@
 # Development
 
 ## Files
-    .
-    ├── README.md
-    ├── autoload
-    │   ├── plum
-    │   │   ├── extensions.vim
-    │   │   ├── fso.vim
-    │   │   ├── term.vim
-    │   │   ├── util.vim
-    │   │   └── vim.vim
-    │   └── plum.vim
-    └── docs
-        ├── dev.md
-        └── notes.yaml
 
-## Context Object
-### context.mode
-Always set. Must be one of 'i', 'n' or visualmode(). see `: help visualmode()`.
+* autoload/plum.vim
+* autoload/plum/vim.vim
+* autoload/plum/fso.vim
+* autoload/plum/term.vim
+* autoload/plum/util.vim
+* autoload/plum/tree.vim
 
-### context.content
-Always set. Either the line under cursor or visual selection.
+## Examples
 
-### context.selection
-Set when mode is 'v'. Contains visual selection.
-
-### context.line
-Set when mode in ['i', 'n']. Contain line under cursor.
-
-### context.path
-Set when mode in ['i', 'n']. Contain path under cursor.
+    : echo "hello\n" . "foo"
+    $ echo "foo\n" bar
+    $ git grep cfile
+    $ echo hello && sleep 5
+    $ sleep 8
+    $ tree .
+    autoload/plum/util.vim:27,29
+    $ echo foo \
+          bar
+    $ cat <<EOF
+    euateha
+    unahoneth
+    nuathoet
+    EOF
