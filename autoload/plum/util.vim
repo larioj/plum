@@ -20,3 +20,11 @@ function! plum#util#visualorline()
   endif
   return r
 endfunction
+
+function! plum#util#path()
+  let old = &isfname
+  set isfname+=58 " allow ':'
+  let p = expand(expand('<cfile>'))
+  let &isfname = old
+  return p
+endfunction

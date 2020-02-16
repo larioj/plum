@@ -58,9 +58,5 @@ function! plum#fso#path()
   if p != ''
     return p
   endif
-  let old = &isfname
-  set isfname+=58 " allow ':'
-  let p = expand(expand('<cfile>'))
-  let &isfname = old
-  return split(p, ':')
+  return split(plum#util#path(), ':')
 endfunction

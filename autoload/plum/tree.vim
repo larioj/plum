@@ -1,5 +1,5 @@
 function! plum#tree#OpenFso()
-  return [ { a, b -> plum#fso#bestpath([s:TreePathUnderCursor()]) }
+  return [ { a, b -> plum#fso#bestpath(split(s:TreePathUnderCursor(), ':')) }
         \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
@@ -10,7 +10,7 @@ function! s:TreePathUnderCursor()
   let lastPathPos = [-1, -1, -1, -1, -1]
   while lastPathPos[1] !=# getpos('.')[1]
     let lastPathPos = getpos('.')
-    let section = expand(expand("<cfile>"))
+    let section = plum#util#path()
     if section == ''
       call winrestview(original)
       return path

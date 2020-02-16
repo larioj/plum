@@ -11,8 +11,17 @@
 
 ## Examples
 
-: echo "hello\n" . "foo"
-$ echo "foo\n" bar
-$ git grep trigger
-$ echo hello && sleep 5
-$ sleep 8
+    : echo "hello\n" . "foo"
+    $ echo "foo\n" bar
+    $ git grep cfile
+    $ echo hello && sleep 5
+    $ sleep 8
+    $ tree .
+    autoload/plum/util.vim:27,29
+    $ echo foo \
+          bar
+    $ cat <<EOF
+    euateha
+    unahoneth
+    nuathoet
+    EOF
