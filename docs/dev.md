@@ -2,6 +2,8 @@
 
 ## Files
 
+* ~/.vimrc
+* autoload/
 * autoload/plum.vim
 * autoload/plum/vim.vim
 * autoload/plum/fso.vim

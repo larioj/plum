@@ -3,17 +3,28 @@ function! plum#fso#OpenFso()
         \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
-function! plum#fso#Act(path, new_tab)
+function! plum#fso#Act(path, is_alt)
   let path = a:path
-  if isdirectory(path[0])
-    lcd path[0]
+  let is_alt = a:is_alt
+  let is_trasient = get(b:, 'plum_transient', v:false)
+  let is_directory = isdirectory(path[0])
+
+  if is_directory
+    if is_alt
+      lcd path[0]
+    else
+      execute 'split ' . path[0]
+      let b:plum_transient = v:true
+    endif
     return
   endif
-  let location = 'split '
-  if a:new_tab
-    let location = 'tabe '
+
+  let command = 'split'
+  if !is_trasient && is_alt
+    let command = 'tabe'
   endif
-  execute location . path[0]
+  execute command . ' ' . path[0]
+  let b:plum_transient = v:false
   if len(path) > 1
     let parts = split(path[1], ',')
     if len(parts) == 2
