@@ -14,10 +14,11 @@ function! plum#Plum(...)
 endfunction
 
 function! s:support_v1(key)
-  if type(a:key) ==# type(0) && a:key !=# 0
+  let key = a:key
+  if type(key) ==# type(0) && key !=# 0
     return 'Shift'
   endif
-  return ''
+  return key
 endfunction
 
 function! plum#SetMouseBindings()
