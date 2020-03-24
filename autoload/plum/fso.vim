@@ -1,12 +1,12 @@
 function! plum#fso#OpenFso()
-  return [ { a, b -> plum#fso#bestpath(plum#fso#path()) }
+  return [ { a, b -> plum#fso#BestInterp(plum#fso#ReadActivePath()) }
         \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
 function! plum#fso#Act(path, is_alt)
   let path = a:path
   let is_alt = a:is_alt
-  let is_trasient = get(b:, 'plum_transient', v:false)
+  let is_transient = get(b:, 'plum_transient', v:false)
   let is_directory = isdirectory(path[0])
 
   if is_directory
@@ -20,7 +20,7 @@ function! plum#fso#Act(path, is_alt)
   endif
 
   let command = 'split'
-  if !is_trasient && is_alt
+  if !is_transient && is_alt
     let command = 'tabe'
   endif
   execute command . ' ' . path[0]
@@ -28,23 +28,27 @@ function! plum#fso#Act(path, is_alt)
   if len(path) > 1
     let parts = split(path[1], ',')
     if len(parts) == 2
-      call plum#fso#vselect(parts[0], parts[1])
+      call plum#fso#SelectLines(parts[0], parts[1])
     else
       execute parts[0]
     endif
   endif
 endfunction
 
-function! plum#fso#bestpath(original)
-  let paths = filter(plum#fso#paths(a:original),
+function! plum#fso#BestInterp(original)
+  let original = a:original
+  if !len(original)
+    return [original, v:false]
+  endif
+  let paths = filter(plum#fso#OrderedInterps(original),
         \ { _, p -> filereadable(p[0]) || isdirectory(p[0]) })
-  if len(paths) ==# 0
-    return ['', v:false]
+  if !len(paths)
+    return [original, v:false]
   endif
   return [paths[0], v:true]
 endfunction
 
-function! plum#fso#vselect(start, end)
+function! plum#fso#SelectLines(start, end)
   let [start, end] = [a:start, a:end]
   call cursor(start, 0)
   execute 'normal! v'
@@ -52,8 +56,11 @@ function! plum#fso#vselect(start, end)
   execute 'normal! $'
 endfunction
 
-function! plum#fso#paths(original)
+function! plum#fso#OrderedInterps(original)
   let original = a:original
+  if !len(original)
+    return []
+  endif
   let paths = [original]
   if trim(original[0][0:0]) != '/'
     let relf = copy(original)
@@ -64,10 +71,18 @@ function! plum#fso#paths(original)
   return paths
 endfunction
 
-function! plum#fso#path()
+function! plum#fso#ReadActivePath()
   let p = plum#util#visual()
-  if p != ''
-    return p
+  if !len(p)
+    let p = plum#util#path()
   endif
-  return split(plum#util#path(), ':')
+  return plum#fso#ParsePath(p)
+endfunction
+
+function! plum#fso#ParsePath(str)
+  let str = a:str
+  if len(str)
+    return split(str, ':')
+  endif
+  return []
 endfunction

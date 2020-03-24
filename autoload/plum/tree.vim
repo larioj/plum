@@ -1,9 +1,13 @@
 function! plum#tree#OpenFso()
-  return [ { a, b -> plum#fso#bestpath(split(s:TreePathUnderCursor(), ':')) }
+  return [ { a, trigger -> plum#fso#BestInterp(plum#fso#ParsePath(s:TreePathUnderCursor(trigger.mode))) }
         \, { p, i -> plum#fso#Act(p, i.key[0:0] ==# 'S') } ]
 endfunction
 
-function! s:TreePathUnderCursor()
+function! s:TreePathUnderCursor(mode)
+  let mode = a:mode
+  if mode !=# 'n' && mode !=# 'i'
+    return ''
+  endif
   let original = winsaveview()
   let sep = ''
   let path = ''
