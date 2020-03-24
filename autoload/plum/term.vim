@@ -62,6 +62,8 @@ function! plum#term#Act(exp)
     echom 'This action requries vim +terminal'
     return
   endif
+  "set vimfile env var
+  let $vimfile = expand('%')
   let windows = {}
   for i in range(1, winnr('$'))
     let windows[bufname(winbufnr(i))] = i
