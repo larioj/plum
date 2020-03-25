@@ -9,6 +9,7 @@
 * autoload/plum/term.vim
 * autoload/plum/util.vim
 * autoload/plum/tree.vim
+* autoload/plum/markdown.vim
 
 ## Examples
 
@@ -26,3 +27,13 @@
     unahoneth
     nuathoet
     EOF
+    $ bash --help
+    $ bash <<EOF
+    echo hello
+    EOF
+
+
+### Markdown Blocks
+```sh
+echo hello
+```
