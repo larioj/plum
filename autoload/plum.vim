@@ -3,7 +3,7 @@ function! plum#Plum(...)
   let b:plum_trigger_mode = trigger.mode 
   let actions = get(g:, 'plum_actions', [])
   let b_actions = get(b:, 'plum_actions', [])
-  let content = plum#util#visualorline()
+  let content = plum#util#ReadActiveContent()
   for [Extract, Act] in b_actions + actions
     let [result, is_match] = Extract(content, trigger)
     if is_match

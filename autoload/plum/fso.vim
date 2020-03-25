@@ -72,7 +72,7 @@ function! plum#fso#OrderedInterps(original)
 endfunction
 
 function! plum#fso#ReadActivePath()
-  let p = plum#util#visual()
+  let p = plum#util#ReadVSel()
   if !len(p)
     let p = plum#util#path()
   endif

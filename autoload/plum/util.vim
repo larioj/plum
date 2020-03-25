@@ -1,24 +1,23 @@
-function! plum#util#visual()
+function! plum#util#ReadVSel()
   if get(b:, 'plum_trigger_mode', '') !=# 'v'
-    return ''
+    return []
   endif
   let [line_start, column_start] = getpos("'<")[1:2]
   let [line_end, column_end] = getpos("'>")[1:2]
   let lines = getline(line_start, line_end)
   if len(lines) == 0
-      return ''
+      return []
   endif
   let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
   let lines[0] = lines[0][column_start - 1:]
-  return join(lines, "\n")
+  return lines
 endfunction
 
-function! plum#util#visualorline()
-  let r = plum#util#visual()
-  if r ==# ''
-    let r = getline('.')
+function! plum#util#ReadActiveContent()
+  if plum#util#HasVSel()
+    return join(plum#util#ReadVSel(), "\n")
   endif
-  return r
+  return getline('.')
 endfunction
 
 function! plum#util#path()
@@ -27,4 +26,9 @@ function! plum#util#path()
   let p = expand(expand('<cfile>'))
   let &isfname = old
   return p
+endfunction
+
+function! plum#util#HasVSel()
+  let m = get(b:, 'plum_trigger_mode', '')
+  return m ==# 'v'
 endfunction

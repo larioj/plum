@@ -7,53 +7,73 @@ function! plum#term#Terminal()
         \, { c, _ -> plum#term#Act(c) } ]
 endfunction
 
-function! plum#term#Extract()
-  let content = plum#util#visualorline()
-
-  " get indentation
-  let size = 0
-  let indentation = ''
-  while trim(indentation) ==# ''
-    let size += 1
-    let indentation = strpart(content, 0, size)
+function! plum#term#ReadEscapeTerminatedLines(start)
+  let start = a:start
+  let end = start
+  let lines = [getline(end)]
+  while lines[-1][-1:] ==# '\' && end < line('$')
+    let end = end + 1
+    call add(lines, getline(end))
   endwhile
-  let size -= 1
-  let indentation = strpart(indentation, 0, size)
+  return [end + 1, lines]
+endfunction
 
-  " check if matches pattern
-  let content = strpart(content, size)
-  if content[0:1] !=# '$ '
+function! plum#term#ReadHeredocBody(start, end_token)
+  let end_token = a:end_token
+  let start = a:start
+  let end = start
+  let lines = [getline(end)]
+  while end < line('$') && lines[-1] !~# (end_token . '$')
+    let end = end + 1
+    call add(lines, getline(end))
+  endwhile
+  return [end + 1, lines]
+endfunction
+
+function! plum#term#ReadBash()
+  let start = line('.')
+  let [end, cmd] = plum#term#ReadEscapeTerminatedLines(start)
+  if  cmd[-1] =~# '<<EOF' || cmd[-1] =~# "<<'EOF'"
+    let [end, body] = plum#term#ReadHeredocBody(end, 'EOF')
+    let cmd = cmd + body
+  endif
+  return cmd
+endfunction
+
+function! plum#term#ReadActiveBash()
+  if plum#util#HasVSel()
+    return plum#util#ReadVSel()
+  endif
+  return plum#term#ReadBash()
+endfunction
+
+function! plum#term#Extract()
+  let is_comment = synIDattr(synIDtrans(synID(line("."), col("$")-1, 1)), "name") ==# 'Comment'
+  let cmd = plum#term#ReadActiveBash()
+  let indent = 0
+  while indent < len(cmd[0]) && strpart(cmd[0], indent, 2) !=# '$ '
+    let indent = indent + 1
+  endwhile
+  let prefix = strpart(cmd[0], 0, indent)
+  if indent >= len(cmd[0]) || 
+        \ (is_comment && len(prefix) && prefix !~# '\v^\W*\s+$') || 
+        \ (!is_comment && len(trim(prefix)))
     return ['', v:false]
   endif
-
-  let lnum = line('.')
-  let lines = [content[2:]]
-
-  " get multiline command
-  while lines[-1][-1:] ==# '\'
-    let lines[-1] = trim(strpart(lines[-1], 0, len(lines[-1]) - 1))
-    let lnum += 1
-    let lines = lines + [getline(lnum)]
-    if lines[-1] =~# ('^' . indentation)
-      let lines[-1] = trim(strpart(lines[-1], size))
-    endif
-  endwhile
-  let lines = [join(lines, ' ')]
-
-  " get heredoc
-  if  lines[-1] =~# '<<EOF' || lines[-1] =~# "<<'EOF'"
-    while trim(lines[-1]) !=# 'EOF' && lnum < line('$')
-      let lnum += 1
-      let lines = lines + [getline(lnum)]
-      if lines[-1] =~# ('^' . indentation)
-        let lines[-1] = strpart(lines[-1], size)
-      else " malformed heredoc
-        return ['', v:false]
-      endif
-    endwhile
+  if is_comment
+    call map(cmd, { _, l -> l[indent:] })
+    let indent = 0
   endif
-
-  return [join(lines, "\n"), v:true]
+  let end = 0
+  while end < len(cmd) && cmd[end][-1:] ==# '\'
+    let end = end + 1
+  endwhile
+  let first_line = cmd[0:end]
+  let rest = cmd[end+1:]
+  call map(first_line, { _, l -> trim(l[-1:] ==# '\' ? strpart(l, 0, len(l) - 1) : l) })
+  let first_line = join(first_line, ' ')
+  call map(rest, { _, l -> l[indent:] })
+  return [join([first_line] + rest, "\n")[2:], v:true]
 endfunction
 
 function! plum#term#Act(exp)
