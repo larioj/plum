@@ -10,8 +10,8 @@ function! plum#fso#Act(path, is_alt)
   let is_directory = isdirectory(path[0])
 
   if is_directory
-    if is_alt
-      lcd path[0]
+    if !is_alt
+      execute 'lcd ' . path[0]
     else
       execute 'split ' . path[0]
       let b:plum_transient = v:true
@@ -72,7 +72,7 @@ function! plum#fso#OrderedInterps(original)
 endfunction
 
 function! plum#fso#ReadActivePath()
-  let p = plum#util#ReadVSel()
+  let p = join(plum#util#ReadVSel(), ' ')
   if !len(p)
     let p = plum#util#path()
   endif
