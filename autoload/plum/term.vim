@@ -99,6 +99,11 @@ function! plum#term#Act(exp)
       let last = cur
       let cur = winnr()
     endwhile
+    wincmd h
+    let cur = winnr()
+    if last ==# cur
+      wincmd l
+    endif
     belowright new
   endif
   let buf = bufnr()

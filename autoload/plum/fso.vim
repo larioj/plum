@@ -19,11 +19,24 @@ function! plum#fso#Act(path, is_alt)
     return
   endif
 
-  let command = 'split'
   if !is_transient && is_alt
-    let command = 'tabe'
+    execute 'tabe ' . path[0]
+  else
+    " create split in correct location
+    let last = 0
+    let cur = winnr()
+    while last !=# cur
+      wincmd k
+      let last = cur
+      let cur = winnr()
+    endwhile
+    wincmd h
+    let cur = winnr()
+    if last ==# cur
+      wincmd l
+    endif
+    execute 'split ' . path[0]
   endif
-  execute command . ' ' . path[0]
   let b:plum_transient = v:false
   if len(path) > 1
     let parts = split(path[1], ',')
