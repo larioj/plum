@@ -77,6 +77,7 @@ function! plum#term#Extract()
 endfunction
 
 function! plum#term#Act(exp)
+  let cwd = getcwd()
   let exp = a:exp
   if !has('terminal')
     echom 'This action requries vim +terminal'
@@ -105,6 +106,7 @@ function! plum#term#Act(exp)
       wincmd l
     endif
     belowright new
+    execute 'lcd ' . cwd
   endif
   let buf = bufnr()
   let win = win_getid()
@@ -114,6 +116,7 @@ function! plum#term#Act(exp)
         \ , 'term_name': exp
         \ , 'curwin': 1
         \ , 'term_finish': 'open'
+        \ , 'cwd': cwd
         \ }
   let command = ['/bin/sh', '-ic', exp]
   call term_start(command, options)

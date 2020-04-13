@@ -4,9 +4,9 @@ function! plum#fso#OpenFso()
 endfunction
 
 function! plum#fso#Act(path, is_alt)
+  let cwd = getcwd()
   let path = a:path
   let is_alt = a:is_alt
-  let is_transient = get(b:, 'plum_transient', v:false)
   let is_directory = isdirectory(path[0])
 
   if is_directory
@@ -14,12 +14,11 @@ function! plum#fso#Act(path, is_alt)
       execute 'lcd ' . path[0]
     else
       execute 'split ' . path[0]
-      let b:plum_transient = v:true
     endif
     return
   endif
 
-  if !is_transient && is_alt
+  if is_alt
     execute 'tabe ' . path[0]
   else
     " create split in correct location
@@ -36,8 +35,8 @@ function! plum#fso#Act(path, is_alt)
       wincmd l
     endif
     execute 'split ' . path[0]
+    execute 'lcd ' . cwd
   endif
-  let b:plum_transient = v:false
   if len(path) > 1
     let parts = split(path[1], ',')
     if len(parts) == 2
@@ -74,12 +73,21 @@ function! plum#fso#OrderedInterps(original)
   if !len(original)
     return []
   endif
-  let paths = [original]
+  let paths = []
   if trim(original[0][0:0]) != '/'
+    " add abs
+    let absf = copy(original)
+    let cwd = getcwd()
+    let absf[0] = simplify(cwd . '/' . absf[0])
+    call add(paths, absf)
+
+    " add relative to cur file
     let relf = copy(original)
     let file_dir = expand('%:p:h')
     let relf[0] = simplify(file_dir . '/' . relf[0])
     call add(paths, relf)
+  else
+    call add(paths, original)
   endif
   return paths
 endfunction
