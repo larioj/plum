@@ -76,6 +76,18 @@ function! plum#term#Extract()
   return [join([first_line] + rest, "\n")[2:], v:true]
 endfunction
 
+function! plum#term#NextWindow()
+  let last = winnr()
+  " move right
+  wincmd l
+  " if at rightmost, move leftmost
+  if winnr() ==# last
+    200 wincmd h
+  endif
+  "move bottommost
+  200 wincmd j
+endfunction
+
 function! plum#term#Act(exp)
   let cwd = getcwd()
   let exp = a:exp
@@ -93,18 +105,7 @@ function! plum#term#Act(exp)
     execute windows[exp] . 'wincmd w'
     enew
   else
-    let last = 0
-    let cur = winnr()
-    while last !=# cur
-      wincmd j
-      let last = cur
-      let cur = winnr()
-    endwhile
-    wincmd h
-    let cur = winnr()
-    if last ==# cur
-      wincmd l
-    endif
+    call plum#term#NextWindow()
     belowright new
     execute 'lcd ' . cwd
   endif
