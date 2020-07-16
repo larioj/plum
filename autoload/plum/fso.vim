@@ -21,20 +21,8 @@ function! plum#fso#Act(path, is_alt)
   if is_alt
     execute 'tabe ' . path[0]
   else
-    " create split in correct location
-    let last = 0
-    let cur = winnr()
-    while last !=# cur
-      wincmd k
-      let last = cur
-      let cur = winnr()
-    endwhile
-    wincmd h
-    let cur = winnr()
-    if last ==# cur
-      wincmd l
-    endif
-    execute 'split ' . path[0]
+    call plum#win#Create(v:true)
+    execute 'edit ' . path[0]
     execute 'lcd ' . cwd
   endif
   if len(path) > 1

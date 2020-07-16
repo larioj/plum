@@ -105,8 +105,7 @@ function! plum#term#Act(exp)
     execute windows[exp] . 'wincmd w'
     enew
   else
-    call plum#term#NextWindow()
-    belowright new
+    call plum#win#Create(v:false)
     execute 'lcd ' . cwd
   endif
   let buf = bufnr()

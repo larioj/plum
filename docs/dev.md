@@ -9,6 +9,7 @@
 * autoload/plum/term.vim
 * autoload/plum/util.vim
 * autoload/plum/tree.vim
+* autoload/plum/win.vim
 * autoload/plum/markdown.vim
 
 ## Examples
