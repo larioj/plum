@@ -69,7 +69,7 @@ function! plum#win#MinCol(state)
   let min = 0
   let i = 1
   while i < len(state)
-    if len(state[i]) < len(state[min])
+    if len(state[i]) <= len(state[min])
       let min = i
     endif
     let i = i + 1
@@ -111,4 +111,24 @@ function! plum#win#Create(top)
     wincmd j
   endif
   enew
+endfunction
+
+function! plum#win#Close()
+  let nrow = plum#win#Rows()
+  if nrow != 1
+    close
+    return
+  endif
+  if winnr('$') <= 3
+    close
+    wincmd =
+    return
+  endif
+  close
+  200 wincmd l
+  while plum#win#Rows() < 2
+    wincmd h
+  endwhile
+  200 wincmd j
+  wincmd L
 endfunction
