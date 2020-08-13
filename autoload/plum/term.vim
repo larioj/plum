@@ -118,7 +118,7 @@ function! plum#term#Act(exp)
         \ , 'term_finish': 'open'
         \ , 'cwd': cwd
         \ }
-  let command = ['/bin/sh', '-ic', exp]
+  let command = ['/bin/bash', '-ic', exp]
   call term_start(command, options)
 endfunction
 

@@ -11,6 +11,8 @@
 * autoload/plum/tree.vim
 * autoload/plum/win.vim
 * autoload/plum/markdown.vim
+* autoload/plum/layout.vim
+* /tmp/hello
 
 ## Examples
 
