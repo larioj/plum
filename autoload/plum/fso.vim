@@ -13,7 +13,7 @@ function! plum#fso#Act(path, is_alt)
     if !is_alt
       execute 'lcd ' . path[0]
     else
-      execute 'split ' . path[0]
+      call plum#layout#Open({-> execute('edit ' . path[0])})
     endif
     return
   endif

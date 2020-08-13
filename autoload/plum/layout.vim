@@ -407,6 +407,18 @@ function! plum#layout#Open(...)
   call plum#layout#ResetViews(original)
 endfunction
 
+function! plum#layout#Edit(...)
+  let LoadFn = get(a:000, 0, {-> v:none})
+  let original = plum#layout#Tab()
+  let w:plum_history = get(w:, 'plum_history', [])
+  if &bufhidden != 'wipe' && &bufhidden != 'delete'
+    call add(w:plum_history, bufnr())
+  endif
+  call LoadFn()
+  exe plum#layout#ResizeCmd()
+  call plum#layout#ResetViews(original)
+endfunction
+
 function! plum#layout#OpenTerm()
   let original = plum#layout#Tab()
   vsplit
@@ -425,6 +437,14 @@ endfunction
 
 function! plum#layout#Close()
   let original = plum#layout#Tab()
+  let w:plum_history = get(w:, 'plum_history', [])
+  if len(w:plum_history)
+    let nr = remove(w:plum_history, -1)
+    exe 'buffer ' . nr
+    exe plum#layout#ResizeCmd()
+    call plum#layout#ResetViews(original, -1)
+    return
+  endif
   let skip_id = win_getid()
   quit
   exe plum#layout#ResizeCmd()
