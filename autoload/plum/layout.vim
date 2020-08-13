@@ -382,16 +382,33 @@ function! plum#layout#MoveCmd(...)
   return cmd
 endfunction
 
+function! plum#layout#ResetViews(...)
+  let root = get(a:000, 0, plum#layout#Tab())
+  let skip_id = get(a:000, 1, -1)
+  let curview = winsaveview()
+  let curid = win_getid()
+  for node in plum#layout#Traversal(root)
+    if node.type == 'leaf' && node.id != skip_id
+      call win_gotoid(node.id)
+      call winrestview({'topline': node.view.topline})
+    endif
+  endfor
+  call win_gotoid(curid)
+  call winrestview(curview)
+endfunction
+
 function! plum#layout#Open(...)
   let LoadFn = get(a:000, 0, {-> v:none})
+  let original = plum#layout#Tab()
   vsplit
   call LoadFn()
   exe plum#layout#MoveCmd()
   exe plum#layout#ResizeCmd()
+  call plum#layout#ResetViews(original)
 endfunction
 
-function! plum#layout#OpenTerm(cmd, opt)
-  let [cmd, opt] = [a:cmd, a:opt]
+function! plum#layout#OpenTerm()
+  let original = plum#layout#Tab()
   vsplit
   let w:plum_terminal_status = 'not_started'
   let w:plum_require_height = 8
@@ -399,15 +416,16 @@ function! plum#layout#OpenTerm(cmd, opt)
   let w:plum_enough_height = 8
   exe plum#layout#MoveCmd()
   exe plum#layout#ResizeCmd()
+  call plum#layout#ResetViews(original)
   unlet w:plum_terminal_status
   unlet w:plum_require_height
   unlet w:plum_want_height
   unlet w:plum_enough_height
-  let opt.curwin = 1
-  call term_start(cmd, opt)
 endfunction
 
 function! plum#layout#Close()
+  let original = plum#layout#Tab()
+  let skip_id = win_getid()
   quit
   exe plum#layout#ResizeCmd()
   let tab = plum#layout#Tab()
@@ -419,6 +437,8 @@ function! plum#layout#Close()
         \ tab.leafs[dest.id].width >= tab.leafs[dest.id].require_width
     return
   endif
+  call win_gotoid(dest.id)
   exe plum#layout#MoveCmd(tab, dest.id)
   exe plum#layout#ResizeCmd()
+  call plum#layout#ResetViews(original, skip_id)
 endfunction

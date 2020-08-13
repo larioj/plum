@@ -12,7 +12,6 @@
 * autoload/plum/win.vim
 * autoload/plum/markdown.vim
 * autoload/plum/layout.vim
-* /tmp/hello
 
 ## Examples
 
@@ -34,7 +33,7 @@
     $ bash <<EOF
     echo hello
     EOF
-
+    $ git diff
 
 ### Markdown Blocks
 ```sh

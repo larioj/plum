@@ -104,8 +104,12 @@ function! plum#term#Act(exp)
   if has_key(windows, exp) && s:is_finised(windows[exp])
     execute windows[exp] . 'wincmd w'
     enew
+    if winheight(0) <= 2
+      resize 2
+    endif
   else
-    call plum#win#Create(v:false)
+    call plum#layout#OpenTerm()
+    enew
     execute 'lcd ' . cwd
   endif
   let buf = bufnr()
@@ -129,6 +133,7 @@ endfunction
 
 function! s:DeleteIfEmpty(buf, win, status)
   let [buf, win, status] = [a:buf, a:win, a:status]
+  let original = plum#layout#Tab()
   call term_wait(buf, 1000)
   let lines = []
   for i in range(1, line('$', win))
@@ -139,4 +144,6 @@ function! s:DeleteIfEmpty(buf, win, status)
     echom 'deleting buf:' . buf . ' win:' . win
     exe buf 'bwipe!'
   endif
+  exe plum#layout#ResizeCmd()
+  call plum#layout#ResetViews(original, win)
 endfunction

@@ -21,8 +21,7 @@ function! plum#fso#Act(path, is_alt)
   if is_alt
     execute 'tabe ' . path[0]
   else
-    call plum#win#Create(v:true)
-    execute 'edit ' . path[0]
+    call plum#layout#Open({-> execute('edit ' . path[0])})
     execute 'lcd ' . cwd
   endif
   if len(path) > 1
