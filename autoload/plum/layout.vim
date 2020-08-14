@@ -81,32 +81,25 @@ function! plum#layout#Traversal(...)
   return traversal
 endfunction
 
-function! plum#layout#Window(id)
-  let id = a:id
-  let curid = win_getid()
-  let curview = winsaveview()
-  call win_gotoid(id)
-
+function! plum#layout#Window(winid)
+  let winid = a:winid
+  let wininfo = getwininfo(winid)[0]
+  let bufnr = wininfo.bufnr
+  let bufinfo = getbufinfo(bufnr)[0]
+  let modifiable = getbufvar(bufnr, '&modifiable')
+  let terminal = wininfo.terminal
   let win = {}
-  let win.id = win_getid()
-  let win.view = winsaveview()
-  let win.height = winheight(0)
+  let win.id = winid
+  let win.view = { 'topline' : wininfo.topline }
+  let win.height = wininfo.height
   let win.require_height = get(w:, 'plum_require_height', 1)
-  let win.want_height = get(w:, 'plum_want_height', min([25, line('$')]))
+  let win.want_height = get(w:, 'plum_want_height', min([25, bufinfo.linecount]))
   let win.enough_height = get(w:, 'plum_enough_height', 
-        \ &modifiable ? max([15, line('$')]) : line('$'))
+        \ modifiable ? max([15, bufinfo.linecount]) : bufinfo.linecount)
   let win.terminal_status = get(w:, 'plum_terminal_status',
-        \ term_getstatus(winbufnr(0)))
-  let win.width = winwidth(0)
+        \ term_getstatus(bufnr))
+  let win.width = wininfo.width
   let win.require_width = 90
-  let win.satisfaction = 
-        \ [ win.height > win.require_height
-        \ , win.height - win.want_height
-        \ , win.height - win.enough_height
-        \ ]
-
-  call win_gotoid(curid)
-  call winrestview(curview)
   return win
 endfunction
 
@@ -115,9 +108,9 @@ function! s:ListCmp(lhs, rhs)
   let rhs = a:rhs
   let i = 0
   while i < min([len(lhs), len(rhs)])
-    if lhs[i] > rhs[i]
+    if lhs[i] < rhs[i]
       return -1
-    elseif lhs[i] < rhs[i]
+    elseif lhs[i] > rhs[i]
       return 1
     endif
     let i = i + 1
@@ -153,8 +146,6 @@ function! plum#layout#Tab(...)
         let node.width = child.width
         let node.require_width =
               \max([get(node, 'require_width', 0), child.require_width])
-        let node.satisfaction = s:MinSat(
-              \ get(node, 'satisfaction', child.satisfaction), child.satisfaction)
       endfor
     else "node.type == 'row'
       for child in node.children
@@ -168,8 +159,6 @@ function! plum#layout#Tab(...)
         let node.width = get(node, 'width', -1) + child.width + 1
         let node.require_width =
               \ get(node, 'require_width', -1) + child.require_width + 1  
-        let node.satisfaction = s:MinSat(
-              \ get(node, 'satisfaction', child.satisfaction), child.satisfaction)
       endfor
     endif
   endfor
@@ -318,14 +307,16 @@ function! plum#layout#Satisfaction(...)
         \ , node.height - node.enough_height
         \ ]
     else
-      unlet node.satisfaction
       for child in node.children
         let node.satisfaction = s:MinSat(
               \ get(node, 'satisfaction', child.satisfaction), child.satisfaction)
       endfor
     endif
   endfor
-  return node.satisfaction
+  if top.type == 'root'
+    return top.layout.satisfaction
+  endif
+  return top.satisfaction
 endfunction
 
 function! plum#layout#ColumnOrder(...)
@@ -372,7 +363,7 @@ function! plum#layout#MoveCmd(...)
     return 'wincmd L'
   endif
   let order = plum#layout#ColumnOrder(without_id)
-  let active_col = order[0][-1]
+  let active_col = order[-1][-1]
   let [files, terminals] = plum#layout#LeafOrder(
         \ without_id.layout.children[active_col])
   let is_term = leaf.terminal_status != ''
@@ -390,7 +381,7 @@ function! plum#layout#ResetViews(...)
   for node in plum#layout#Traversal(root)
     if node.type == 'leaf' && node.id != skip_id
       call win_gotoid(node.id)
-      call winrestview({'topline': node.view.topline})
+      call winrestview(node.view)
     endif
   endfor
   call win_gotoid(curid)
@@ -450,7 +441,7 @@ function! plum#layout#Close()
   exe plum#layout#ResizeCmd()
   let tab = plum#layout#Tab()
   let order = plum#layout#ColumnOrder(tab)
-  let active_col = order[-1][-1]
+  let active_col = order[0][-1]
   let [files, terminals] = plum#layout#LeafOrder(tab.layout.children[active_col])
   let dest = len(terminals) ? terminals[-1] : files[0]
   if len(tab.leafs) == len(tab.layout.children) &&
