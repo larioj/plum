@@ -302,7 +302,7 @@ function! plum#layout#Satisfaction(...)
   for node in plum#layout#Traversal(top)
     if node.type == 'leaf'
       let node.satisfaction =
-        \ [ node.height > node.require_height
+        \ [ node.height >= node.require_height
         \ , node.height - node.want_height
         \ , node.height - node.enough_height
         \ ]
@@ -380,8 +380,13 @@ function! plum#layout#ResetViews(...)
   let curid = win_getid()
   for node in plum#layout#Traversal(root)
     if node.type == 'leaf' && node.id != skip_id
+      "echo 'reset ' . node.id . ' ' . node.view.topline
       call win_gotoid(node.id)
+      call execute(node.view.topline + 2)
       call winrestview(node.view)
+    endif
+    if node.type == 'leaf' && node.id == skip_id
+      "echo 'skiping ' . skip_id
     endif
   endfor
   call win_gotoid(curid)
@@ -414,10 +419,10 @@ function! plum#layout#OpenTerm()
   let original = plum#layout#Tab()
   vsplit
   let w:plum_terminal_status = 'not_started'
+  exe plum#layout#MoveCmd()
   let w:plum_require_height = 8
   let w:plum_want_height = 8
   let w:plum_enough_height = 8
-  exe plum#layout#MoveCmd()
   exe plum#layout#ResizeCmd()
   call plum#layout#ResetViews(original)
   unlet w:plum_terminal_status
@@ -437,6 +442,7 @@ function! plum#layout#Close()
     return
   endif
   let skip_id = win_getid()
+  wincmd L
   quit
   exe plum#layout#ResizeCmd()
   let tab = plum#layout#Tab()
@@ -444,8 +450,11 @@ function! plum#layout#Close()
   let active_col = order[0][-1]
   let [files, terminals] = plum#layout#LeafOrder(tab.layout.children[active_col])
   let dest = len(terminals) ? terminals[-1] : files[0]
-  if len(tab.leafs) == len(tab.layout.children) &&
-        \ tab.leafs[dest.id].width >= tab.leafs[dest.id].require_width
+  call win_gotoid(dest.id)
+  if len(files) + len(terminals) == 1 ||
+        \ (len(tab.leafs) == len(tab.layout.children) &&
+        \    tab.leafs[dest.id].width >= tab.leafs[dest.id].require_width)
+    call plum#layout#ResetViews(original, skip_id)
     return
   endif
   call win_gotoid(dest.id)
