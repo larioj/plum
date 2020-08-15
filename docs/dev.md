@@ -18,8 +18,8 @@
 
     : echo "hello\n" . "foo"
     $ echo "foo\n" bar
-    $ git grep cfile
-    $ echo hello && sleep 5
+    $ git grep plum#term#NextWindow
+    $ echo hello && sleep 2
     $ sleep 8
     $ tree .
     autoload/plum/util.vim:27,29
@@ -35,6 +35,7 @@
     echo hello
     EOF
     $ git diff
+    $ echo
 
 ### Markdown Blocks
 ```sh

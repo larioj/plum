@@ -76,47 +76,34 @@ function! plum#term#Extract()
   return [join([first_line] + rest, "\n")[2:], v:true]
 endfunction
 
-function! plum#term#NextWindow()
-  let last = winnr()
-  " move right
-  wincmd l
-  " if at rightmost, move leftmost
-  if winnr() ==# last
-    200 wincmd h
-  endif
-  "move bottommost
-  200 wincmd j
-endfunction
-
 function! plum#term#Act(exp)
-  let cwd = getcwd()
   let exp = a:exp
   if !has('terminal')
     echom 'This action requries vim +terminal'
     return
   endif
-  "set vimfile env var
+  let cwd = getcwd()
+  let views = plum#layout#GetViews()
   let $vimfile = expand('%')
-  let windows = {}
-  for i in range(1, winnr('$'))
-    let windows[bufname(winbufnr(i))] = i
+  let destid = 0
+  for winnr in range(1, winnr('$'))
+    let name = bufname(winbufnr(winnr))
+    if name ==# exp
+      let destid = win_getid(winnr)
+    endif
   endfor
-  if has_key(windows, exp) && s:is_finised(windows[exp])
-    execute windows[exp] . 'wincmd w'
-    enew
-    if winheight(0) <= 2
+  if destid && term_getstatus(winbufnr(destid)) == 'finished'
+    unlet views[destid]
+    call win_gotoid(destid)
+    if winheight(0) < 2
       resize 2
     endif
   else
-    call plum#layout#OpenTerm()
-    enew
-    execute 'lcd ' . cwd
+    botright vsplit
   endif
-  let buf = bufnr()
-  let win = win_getid()
-  echom 'created buf:' . buf . ' win:' . win
+  let winid = win_getid()
   let options =
-        \ { 'exit_cb': { _, status -> s:DeleteIfEmpty(buf, win, status) }
+        \ { 'exit_cb': { _, status -> s:DeleteIfEmpty(winid, status) }
         \ , 'term_name': exp
         \ , 'curwin': 1
         \ , 'term_finish': 'open'
@@ -124,26 +111,37 @@ function! plum#term#Act(exp)
         \ }
   let command = ['/bin/bash', '-ic', exp]
   call term_start(command, options)
+  call plum#layout#Move(win_getid(), views)
 endfunction
 
-function! s:is_finised(win)
-  let buf = winbufnr(a:win)
-  return term_getstatus(buf) == 'finished'
-endfunction
-
-function! s:DeleteIfEmpty(buf, win, status)
-  let [buf, win, status] = [a:buf, a:win, a:status]
-  let original = plum#layout#Tab()
-  call term_wait(buf, 1000)
-  let lines = []
-  for i in range(1, line('$', win))
-    call add(lines, term_getline(buf, i))
-  endfor
-  echom 'checking buf:' . buf . ' win:' . win
-  if trim(join(lines, "\n")) ==# '' && status ==# 0
-    echom 'deleting buf:' . buf . ' win:' . win
-    exe buf 'bwipe!'
+function! s:SetBottomLine(winid)
+  let winid = a:winid
+  let winlist = getwininfo(winid)
+  if len(winlist)
+    let win = winlist[0]
+    let buf = getbufinfo(win.bufnr)[0]
+    let topline = max([1, buf.linecount - win.height + 1])
+    let lnum = topline
+    let views = {}
+    let views[winid] = {'topline': topline, 'lnum': lnum }
+    call plum#layout#PutViews(views)
   endif
+endfunction
+
+function! s:DeleteIfEmpty(winid, status)
+  let [winid, status] = [a:winid, a:status]
+  let bufnr = winbufnr(winid)
+  call term_wait(bufnr, 1000)
+  let bufcontent = trim(join(getbufline(bufnr, 1, '$'), "\n"))
+  if status || len(bufcontent)
+    let views = plum#layout#GetViews()
+    exe plum#layout#ResizeCmd()
+    call plum#layout#PutViews(views)
+    call s:SetBottomLine(winid)
+    return
+  endif
+  let views = plum#layout#GetViews()
+  exe bufnr . ' bwipe!'
   exe plum#layout#ResizeCmd()
-  call plum#layout#ResetViews(original, win)
+  call plum#layout#PutViews(views)
 endfunction

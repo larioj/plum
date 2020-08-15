@@ -88,18 +88,17 @@ function! plum#layout#Window(winid)
   let bufinfo = getbufinfo(bufnr)[0]
   let modifiable = getbufvar(bufnr, '&modifiable')
   let terminal = wininfo.terminal
+  let term_status = term_getstatus(bufnr)
   let win = {}
   let win.id = winid
-  let win.view = { 'topline' : wininfo.topline }
-  let win.height = wininfo.height
-  let win.require_height = get(w:, 'plum_require_height', 1)
-  let win.want_height = get(w:, 'plum_want_height', min([25, bufinfo.linecount]))
-  let win.enough_height = get(w:, 'plum_enough_height', 
-        \ modifiable ? max([15, bufinfo.linecount]) : bufinfo.linecount)
-  let win.terminal_status = get(w:, 'plum_terminal_status',
-        \ term_getstatus(bufnr))
   let win.width = wininfo.width
   let win.require_width = 90
+  let win.height = wininfo.height
+  let win.require_height = terminal && term_status != 'finished' ? 2 : 1
+  let win.want_height = min([25, bufinfo.linecount])
+  let win.enough_height = 
+        \ modifiable ? max([15, bufinfo.linecount]) : bufinfo.linecount
+  let win.terminal_status = term_status
   return win
 endfunction
 
@@ -252,51 +251,6 @@ function! plum#layout#ResizeCmd(...)
   return cmd . cmd
 endfunction
 
-function! plum#layout#FindParent(parent, index, layout, id)
-  let [parent, index, layout, id] = [a:parent, a:index, a:layout, a:id]
-  if layout[0] == 'leaf'
-    return [layout[1] == id, parent, index]
-  endif
-  for i in range(len(layout[1]))
-    let child = layout[1][i]
-    let [is_found, p, j] = plum#layout#FindParent(layout, i, child, id)
-    if is_found
-      return [is_found, p, j]
-    endif
-  endfor
-  return [v:false, parent, index]
-endfunction
-
-function! plum#layout#Delete(...)
-  let id = get(a:000, 0, win_getid())
-  let root = get(a:000, 1, plum#layout#Tab())
-  let original_layout = deepcopy(root.original_layout)
-  if original_layout[0] == 'leaf'
-    return [v:false, v:none]
-  endif
-  let [is_found, parent, index] = 
-        \ plum#layout#FindParent(v:none, -1, original_layout, id)
-  if is_found
-    call remove(parent[1], index)
-    let layout = plum#layout#Layout(original_layout)
-    let WinFn = {id -> root.leafs[id]}
-    let tab = plum#layout#Tab(layout, WinFn)
-    let tab.layout.height = root.layout.height
-    let tab.layout.width = root.layout.width
-    call plum#layout#Resize(tab)
-    return [v:true, tab]
-  endif
-  return [v:false, v:none]
-endfunction
-
-function! s:Descend(node)
-  let node = a:node
-  if node.type == 'leaf'
-    return node
-  endif
-  return s:Descend(node.children[0])
-endfunction
-
 function! plum#layout#Satisfaction(...)
   let top = get(a:000, 0, plum#layout#Tab())
   for node in plum#layout#Traversal(top)
@@ -332,133 +286,116 @@ function! plum#layout#ColumnOrder(...)
   return order
 endfunction
 
-function! plum#layout#LeafOrder(...)
-  let top = get(a:000, 0, plum#layout#Tab())
-  let files = []
-  let terminals = []
-  for node in plum#layout#Traversal(top)
-    if node.type == 'leaf'
-      if node.terminal_status == ''
-        call add(files, node)
-      else
-        call add(terminals, node)
-      endif
-    endif
-  endfor
-  return [files, terminals]
+function! plum#layout#Move(...)
+  let winid = get(a:000, 0, win_getid())
+  let views = get(a:000, 1, plum#layout#GetViews())
+  call win_gotoid(winid)
+  wincmd L
+  let tab = plum#layout#Tab()
+  let wincol_idx = len(tab.layout.children) - 1
+  let win = tab.layout.children[wincol_idx].children[0]
+  if win.width >= win.require_width || len(tab.layout.children) == 1
+    call plum#layout#PutViews(views)
+    call win_gotoid(winid)
+    return
+  endif
+  " increasing in height satisfaction
+  let order = plum#layout#ColumnOrder(tab)
+  let col_idx = order[-1][-1]
+  if col_idx == wincol_idx
+    let col_idx = order[-2][-1]
+  endif
+  let col = tab.layout.children[col_idx]
+  let is_term = win.terminal_status != ''
+  let relative_loc = is_term ? 'BELOW' : 'ABOVE'
+  let dest = is_term ? col.children[-1] : col.children[0]
+  call plum#layout#SplitMove(win, dest, relative_loc)
+  exe plum#layout#ResizeCmd()
+  call plum#layout#PutViews(views)
+  call win_gotoid(winid)
 endfunction
 
-function! plum#layout#MoveCmd(...)
-  let top = get(a:000, 0, plum#layout#Tab())
-  let id = get(a:000, 1, win_getid())
-  if len(top.leafs) == 1
-    return ''
+function! plum#layout#SplitMove(source, dest, ...)
+  let [source, dest, relative_loc] = [a:source, a:dest, get(a:000, 0, 'ABOVE')]
+  if source.type != 'leaf' || dest.type != 'leaf'
+    throw 'ERR1: TODO(larioj): implement support for nested windows'
   endif
-  let [success, without_id] = plum#layout#Delete(id, top)
-  if !success
-    return ''
-  endif
-  let leaf = top.leafs[id]
-  if leaf.require_width + without_id.layout.require_width < top.layout.width
-    return 'wincmd L'
-  endif
-  let order = plum#layout#ColumnOrder(without_id)
-  let active_col = order[-1][-1]
-  let [files, terminals] = plum#layout#LeafOrder(
-        \ without_id.layout.children[active_col])
-  let is_term = leaf.terminal_status != ''
-  let dest = is_term ? (files + terminals)[-1] : (files + terminals)[0]
-  let opt = '{"rightbelow" : ' . is_term . '}'
-  let cmd = 'call win_splitmove(' . id . ','. dest.id . ',' . opt . ')'
-  return cmd
+  let opt = {'rightbelow': tolower(relative_loc[0]) == 'b'}
+  call win_splitmove(source.id, dest.id, opt)
 endfunction
 
-function! plum#layout#ResetViews(...)
-  let root = get(a:000, 0, plum#layout#Tab())
-  let skip_id = get(a:000, 1, -1)
-  let curview = winsaveview()
+function! plum#layout#GetViews()
   let curid = win_getid()
-  for node in plum#layout#Traversal(root)
-    if node.type == 'leaf' && node.id != skip_id
-      "echo 'reset ' . node.id . ' ' . node.view.topline
-      call win_gotoid(node.id)
-      call execute(node.view.topline + 2)
-      call winrestview(node.view)
-    endif
-    if node.type == 'leaf' && node.id == skip_id
-      "echo 'skiping ' . skip_id
+  let views = {}
+  for nr in range(1, winnr('$'))
+    let id = win_getid(nr)
+    call win_gotoid(id)
+    let views[id] = winsaveview()
+  endfor
+  call win_gotoid(curid)
+  return views
+endfunction
+
+function! plum#layout#PutViews(views)
+  let views = a:views
+  let curid = win_getid()
+  for nr in range(1, winnr('$'))
+    let id = win_getid(nr)
+    if has_key(views, id)
+      call win_gotoid(id)
+      let view = copy(views[id])
+      let height = winheight(id)
+      let botline = view.topline + height - 3
+      let view.lnum = max([view.topline, min([botline, view.lnum])])
+      call winrestview(view)
     endif
   endfor
   call win_gotoid(curid)
-  call winrestview(curview)
 endfunction
 
 function! plum#layout#Open(...)
   let LoadFn = get(a:000, 0, {-> v:none})
-  let original = plum#layout#Tab()
-  vsplit
+  let views = plum#layout#GetViews()
+  botright vsplit
   call LoadFn()
-  exe plum#layout#MoveCmd()
-  exe plum#layout#ResizeCmd()
-  call plum#layout#ResetViews(original)
+  call plum#layout#Move(win_getid(), views)
+endfunction
+
+function! plum#layout#MaxId()
+  let max = 0
+  for nr in range(1, winnr('$'))
+    let id = win_getid(nr)
+    let max = max([max, id])
+  endfor
+  return max
+endfunction
+
+function! plum#layout#Close()
+  let views = plum#layout#GetViews()
+  let winid = win_getid()
+  let w:plum_history = get(w:, 'plum_history', [])
+  if len(w:plum_history)
+    unlet views[winid]
+    let nr = remove(w:plum_history, -1)
+    exe 'buffer ' . nr
+    exe plum#layout#ResizeCmd()
+    call plum#layout#PutViews(views)
+    return
+  endif
+  quit
+  let dest = plum#layout#MaxId()
+  call plum#layout#Move(dest, views)
 endfunction
 
 function! plum#layout#Edit(...)
   let LoadFn = get(a:000, 0, {-> v:none})
-  let original = plum#layout#Tab()
   let w:plum_history = get(w:, 'plum_history', [])
   if &bufhidden != 'wipe' && &bufhidden != 'delete'
     call add(w:plum_history, bufnr())
   endif
   call LoadFn()
+  let views = plum#layout#GetViews()
   exe plum#layout#ResizeCmd()
-  call plum#layout#ResetViews(original)
-endfunction
-
-function! plum#layout#OpenTerm()
-  let original = plum#layout#Tab()
-  vsplit
-  let w:plum_terminal_status = 'not_started'
-  exe plum#layout#MoveCmd()
-  let w:plum_require_height = 8
-  let w:plum_want_height = 8
-  let w:plum_enough_height = 8
-  exe plum#layout#ResizeCmd()
-  call plum#layout#ResetViews(original)
-  unlet w:plum_terminal_status
-  unlet w:plum_require_height
-  unlet w:plum_want_height
-  unlet w:plum_enough_height
-endfunction
-
-function! plum#layout#Close()
-  let original = plum#layout#Tab()
-  let w:plum_history = get(w:, 'plum_history', [])
-  if len(w:plum_history)
-    let nr = remove(w:plum_history, -1)
-    exe 'buffer ' . nr
-    exe plum#layout#ResizeCmd()
-    call plum#layout#ResetViews(original, -1)
-    return
-  endif
-  let skip_id = win_getid()
-  wincmd L
-  quit
-  exe plum#layout#ResizeCmd()
-  let tab = plum#layout#Tab()
-  let order = plum#layout#ColumnOrder(tab)
-  let active_col = order[0][-1]
-  let [files, terminals] = plum#layout#LeafOrder(tab.layout.children[active_col])
-  let dest = len(terminals) ? terminals[-1] : files[0]
-  call win_gotoid(dest.id)
-  if len(files) + len(terminals) == 1 ||
-        \ (len(tab.leafs) == len(tab.layout.children) &&
-        \    tab.leafs[dest.id].width >= tab.leafs[dest.id].require_width)
-    call plum#layout#ResetViews(original, skip_id)
-    return
-  endif
-  call win_gotoid(dest.id)
-  exe plum#layout#MoveCmd(tab, dest.id)
-  exe plum#layout#ResizeCmd()
-  call plum#layout#ResetViews(original, skip_id)
+  unlet views[win_getid()]
+  call plum#layout#PutViews(views)
 endfunction
