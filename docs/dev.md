@@ -12,7 +12,6 @@
 * autoload/plum/win.vim
 * autoload/plum/markdown.vim
 * autoload/plum/layout.vim
-* autoload/win.vim
 
 ## Examples
 
