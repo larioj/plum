@@ -94,7 +94,7 @@ function! plum#layout#Window(winid)
   let win.width = wininfo.width
   let win.require_width = 90
   let win.height = wininfo.height
-  let win.require_height = terminal && term_status != 'finished' ? 2 : 1
+  let win.require_height = terminal && term_status != 'finished' ? 3 : 1
   let win.want_height = min([25, bufinfo.linecount])
   let win.enough_height = 
         \ modifiable ? max([15, bufinfo.linecount]) : bufinfo.linecount
