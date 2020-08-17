@@ -387,6 +387,25 @@ function! plum#layout#Close()
   call plum#layout#Move(dest, views)
 endfunction
 
+function! plum#layout#Delete()
+  let views = plum#layout#GetViews()
+  let winid = win_getid()
+  let bufnr = bufnr()
+  let w:plum_history = get(w:, 'plum_history', [])
+  if len(w:plum_history)
+    unlet views[winid]
+    let nr = remove(w:plum_history, -1)
+    exe 'buffer ' . nr
+    exe bufnr . ' bdelete!'
+    exe plum#layout#ResizeCmd()
+    call plum#layout#PutViews(views)
+    return
+  endif
+  bdelete!
+  let dest = plum#layout#MaxId()
+  call plum#layout#Move(dest, views)
+endfunction
+
 function! plum#layout#Edit(...)
   let LoadFn = get(a:000, 0, {-> v:none})
   let w:plum_history = get(w:, 'plum_history', [])
