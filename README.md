@@ -1,5 +1,5 @@
 # Plum
-Execute action based upon the content under cursor.
+*Vim 8.2 required*. Execute action based upon the content under cursor.
 
 ## Demo
 
