@@ -1,20 +1,36 @@
 # Development
 
-## Files
-
 * ~/.vimrc
+
+## Core
+
 * autoload/plum.vim
+* autoload/plum/util.vim
+
+## Core Commands
+
 * autoload/plum/vim.vim
 * autoload/plum/fso.vim
 * autoload/plum/term.vim
-* autoload/plum/util.vim
+
+## Window Manager Agnostic Commands
+
+* autoload/plum/term2.vim
+* autoload/plum/fso2.vim
+
+## Extra Commands
+
 * autoload/plum/tree.vim
-* autoload/plum/win.vim
 * autoload/plum/markdown.vim
+
+## Window Managers
+
 * autoload/plum/layout.vim
+* autoload/winman.vim
 
 ## Examples
 
+    $ git grep plum#win
     : echo "hello\n" . "foo"
     $ echo "foo\n" bar
     $ git grep plum#term#NextWindow
