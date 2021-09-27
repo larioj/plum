@@ -92,3 +92,71 @@ function! winman#BalanceStacks()
     endfor
   endfor
 endfunction
+
+function! winman#GetWin(...)
+  let layout = get(a:000, 0, winman#Layout())
+  let winid = win_getid()
+  for i in range(len(layout))
+    for j in range(len(layout[i]))
+      if winid == layout[i][j]
+        return [i, j]
+      endif
+    endfor
+  endfor
+endfunction
+
+function! winman#Fix()
+  let [type, root] = winlayout()
+  if type == 'col'
+    let [_, source] = root[0]
+    let [dtype, dest] = root[1]
+    if dtype == 'leaf'
+      call win_splitmove(source, dest, {'vertical': 1, 'rightbelow': 1})
+    else "dtype == 'row'
+      let [dtype, dest] = dest[-1]
+      if dtype == 'col'
+        let dest = dest[0][1]
+      endif
+      call win_splitmove(source, dest)
+    endif
+  endif
+  call winman#BalanceStacks()
+endfunction
+
+function! winman#Open(...)
+  let path = get(a:000, 0, '')
+  let winid = win_getid()
+  let layout = winman#Layout()
+  for i in range(len(layout))
+    for j in range(len(layout[i]))
+      if winid == layout[i][j] && i == 0 && len(layout) > 1
+        set splitbelow
+      endif
+    endfor
+  endfor
+  execute 'split ' . path
+  set nosplitbelow
+endfunction
+
+function! winman#AfterClose()
+  let [type, _] = winlayout()
+  if type == 'col'
+    wincmd j
+    wincmd L
+  endif
+  call winman#BalanceStacks()
+endfunction
+
+function! winman#Close()
+  quit
+  call winman#AfterClose()
+endfunction
+
+function! winman#EnableWinman()
+  command! -bang -complete=file -nargs=* WinmanOpen
+      \ call winman#Open(<q-args>)
+  command! -nargs=0 WinmanAfterClose call winman#AfterClose()
+  augroup winman
+    autocmd WinNew * :call winman#Fix()
+  augroup END
+endfunction

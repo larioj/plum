@@ -29,7 +29,7 @@ function! plum#fso2#Open(path, is_alt)
   endif
 endfunction
 
-function! plum#fso#OpenFso()
+function! plum#fso2#OpenFso()
   return [ { a, b -> plum#fso#BestInterp(plum#fso#ReadActivePath()) }
         \, { p, i -> plum#fso2#Open(p, i.key[0:0] ==# 'S') } ]
 endfunction

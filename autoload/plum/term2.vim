@@ -1,5 +1,6 @@
 function! s:CloseIfEmpty(winid, status)
   let [winid, status] = [a:winid, a:status]
+  let after_close = get(g:, 'plum_after_close', '')
   let bufnr = winbufnr(winid)
   call term_wait(bufnr, 1000)
   let bufcontent = trim(join(getbufline(bufnr, 1, '$'), "\n"))
@@ -7,6 +8,7 @@ function! s:CloseIfEmpty(winid, status)
     return
   endif
   exe bufnr . ' bwipe!'
+  exe after_close
 endfunction
 
 function! plum#term2#Eval(exp)
