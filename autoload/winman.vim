@@ -1,3 +1,4 @@
+" TODO: rename layout to grid
 function! winman#Layout()
   let [orientation, root] = winlayout()
   if orientation == 'leaf'
@@ -105,20 +106,47 @@ function! winman#GetWin(...)
   endfor
 endfunction
 
+function! winman#FindCol(id, ...)
+  let id = a:id
+  let n = get(a:000, 0, 0)
+  let seen = get(a:000, 1, 0)
+  let [type, root] = get(a:000, 2, winlayout())
+  if type == 'leaf'
+    if id == root
+      return n
+    else
+      return -1
+    endif
+  endif
+  if type == 'col' || seen
+    for node in root
+      let result = winman#FindCol(id, n, seen, node)
+      if result != -1
+        return result
+      endif
+    endfor
+  else
+    for i in range(len(root))
+      let result = winman#FindCol(id, i, seen, root[i])
+      if result != -1
+        return result
+      endif
+    endfor
+  endif
+  return -1
+endfunction
+
 function! winman#Fix()
   let [type, root] = winlayout()
   if type == 'col'
-    let [_, source] = root[0]
-    let [dtype, dest] = root[1]
-    if dtype == 'leaf'
-      call win_splitmove(source, dest, {'vertical': 1, 'rightbelow': 1})
-    else "dtype == 'row'
-      let [dtype, dest] = dest[-1]
-      if dtype == 'col'
-        let dest = dest[0][1]
-      endif
-      call win_splitmove(source, dest)
-    endif
+    let source = win_getid()
+    let dest = get(g:, 'plum_last_window', 1000)
+    let is_vert = root[0][0] == root[1][0]
+    let dest_col = winman#FindCol(dest)
+    let opt = {
+          \ 'vertical': is_vert,
+          \ 'rightbelow': is_vert || dest_col == 0 }
+    call win_splitmove(source, dest, opt)
   endif
   call winman#BalanceStacks()
 endfunction
@@ -157,6 +185,7 @@ function! winman#EnableWinman()
       \ call winman#Open(<q-args>)
   command! -nargs=0 WinmanAfterClose call winman#AfterClose()
   augroup winman
+    autocmd WinEnter * :let g:plum_last_window=win_getid()
     autocmd WinNew * :call winman#Fix()
   augroup END
 endfunction
