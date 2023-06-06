@@ -30,9 +30,3 @@ $ git status
 
 ## Configuration
 - ~/.config/nvim/init.vim
-
-
-
-:  aunmenu PopUp.How-to\ disable\ mouse
-  aunmenu PopUp.-1-
-

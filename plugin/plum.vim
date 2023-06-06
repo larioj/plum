@@ -2,11 +2,13 @@
 let g:plum_pits = get(g:, 'plum_pits', [])
 let g:plum_enable_mouse_bindings = get(g:, 'plum_enable_mouse_bindings', 1)
 let g:plum_enable_key_bindings = get(g:, 'plum_enable_key_bindings', 1)
-let g:default_term_opts = {}
-let g:default_job_opts = {}
+let g:default_term_opts =  get(g:, 'default_term_opts', {})
+let g:default_job_opts = get(g:, 'default_job_opts', {})
 
 " Core
-function! Plum()
+function! Plum(...)
+  let g:plum_mode = get(a:, 1, 'n')
+  let show_menu = get(a:, 2, 0)
   aunmenu PopUp
   let g:plum_popup_thunks = []
   let g:plum_popup_results = []
@@ -16,10 +18,30 @@ function! Plum()
       let index = string(len(g:plum_popup_thunks))
       call add(g:plum_popup_thunks, Apply)
       call add(g:plum_popup_results, result)
-      call execute('menu PopUp.' . name . ' <cmd>call g:plum_popup_thunks[' . index . '](g:plum_popup_results[' . index . '])<cr>')
+      call execute(g:plum_mode . 'noremenu PopUp.' . name . ' <cmd>call g:plum_popup_thunks[' . index . '](g:plum_popup_results[' . index . '])<cr>')
     endif
   endfor
-  popup PopUp
+  if ! len(g:plum_popup_results)
+    return
+  endif
+  if show_menu
+    popup PopUp
+  else
+    call g:plum_popup_thunks[0](g:plum_popup_results[0])
+  endif
+endfunction
+
+" Utilities
+function! Visual()
+  let [line_start, column_start] = getpos("'<")[1:2]
+  let [line_end, column_end] = getpos("'>")[1:2]
+  let lines = getline(line_start, line_end)
+  if len(lines) == 0
+      return ''
+  endif
+  let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
+  let lines[0] = lines[0][column_start - 1:]
+  return join(lines, "\n")
 endfunction
 
 " Combinator Library
@@ -52,16 +74,24 @@ function! s:WithTrimPrefixH(prefix, Extract)
 endfunction
 let g:WithTrimPrefix = { p, e -> { -> s:WithTrimPrefixH(p, e) } }
 
+function! s:AltVisualH(Extract)
+  if g:plum_mode == 'v'
+    return Visual()
+  endif
+  return Extract()
+endfunction
+let g:AltVisual = { e -> { -> s:AltVisualH(e) } }
+
 " Extracts
 let g:ExtractLine = { -> getline('.') }
 let g:ExtractCFile = { -> expand(expand('<cfile>')) }
-let g:ExtractFile = WithCond({c -> filereadable(c)}, g:ExtractCFile)
-let g:ExtractDir = WithCond({c -> isdirectory(c)}, g:ExtractCFile)
-let g:ExtractTerm = WithTrimPrefix('$ ', g:ExtractLine)
-let g:ExtractJob = WithTrimPrefix('% ', g:ExtractLine)
-let g:ExtractVim = WithTrimPrefix(': ', g:ExtractLine)
+let g:ExtractFile = WithCond({c -> filereadable(c)}, AltVisual(g:ExtractCFile))
+let g:ExtractDir = WithCond({c -> isdirectory(c)}, AltVisual(g:ExtractCFile))
+let g:ExtractTerm = WithTrimPrefix('$ ', AltVisual(g:ExtractLine))
+let g:ExtractJob = WithTrimPrefix('% ', AltVisual(g:ExtractLine))
+let g:ExtractVim = WithTrimPrefix(': ', AltVisual(g:ExtractLine))
 let g:ExtractWord = { -> expand('<cword>') }
-let g:ExtractRepoWord = WithCond({ _ -> trim(system('git rev-parse --is-inside-work-tree 2>/dev/null')) == 'true' }, g:ExtractWord)
+let g:ExtractRepoWord = WithCond({ _ -> trim(system('git rev-parse --is-inside-work-tree 2>/dev/null')) == 'true' }, AltVisual(g:ExtractWord))
 
 " Actions
 let g:Execute = { c -> execute(c, '') }
@@ -94,9 +124,14 @@ function! s:WinmanSplitH(Fn, c)
 endfunction
 let g:WinmanSplit = { fn -> { c -> s:WinmanSplitH(fn, c) }}
 
-
 " Bindings
 if g:plum_enable_mouse_bindings
-  nnoremap <RightMouse> <LeftMouse>:call Plum()<cr>
+  nnoremap <RightMouse> <LeftMouse>:call Plum('n', 1)<cr>
+  vnoremap <RightMouse> <LeftMouse>:<c-u>call Plum('v', 1)<cr>
+  inoremap <RightMouse> <LeftMouse><esc>:call Plum('i', 1)<cr>
 endif
 
+if g:plum9_enable_key_bindings
+  nnoremap o :call Plum('n', 1)<cr>
+  vnoremap o :<c-u>call Plum('v', 1)<cr>
+endif
