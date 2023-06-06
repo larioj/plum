@@ -1,7 +1,6 @@
 " Configuration
 let g:plum_pits = get(g:, 'plum_pits', [])
 let g:plum_enable_mouse_bindings = get(g:, 'plum_enable_mouse_bindings', 1)
-let g:plum_enable_key_bindings = get(g:, 'plum_enable_key_bindings', 1)
 let g:default_term_opts =  get(g:, 'default_term_opts', {})
 let g:default_job_opts = get(g:, 'default_job_opts', {})
 
@@ -18,7 +17,8 @@ function! Plum(...)
       let index = string(len(g:plum_popup_thunks))
       call add(g:plum_popup_thunks, Apply)
       call add(g:plum_popup_results, result)
-      call execute(g:plum_mode . 'noremenu PopUp.' . name . ' <cmd>call g:plum_popup_thunks[' . index . '](g:plum_popup_results[' . index . '])<cr>')
+      "call execute(g:plum_mode . 'noremenu PopUp.' . name . ' <cmd>call g:plum_popup_thunks[' . index . '](g:plum_popup_results[' . index . '])<cr>')
+      call execute('menu PopUp.' . name . ' <cmd>call g:plum_popup_thunks[' . index . '](g:plum_popup_results[' . index . '])<cr>')
     endif
   endfor
   if ! len(g:plum_popup_results)
@@ -78,7 +78,7 @@ function! s:AltVisualH(Extract)
   if g:plum_mode == 'v'
     return Visual()
   endif
-  return Extract()
+  return a:Extract()
 endfunction
 let g:AltVisual = { e -> { -> s:AltVisualH(e) } }
 
@@ -87,7 +87,8 @@ let g:ExtractLine = { -> getline('.') }
 let g:ExtractCFile = { -> expand(expand('<cfile>')) }
 let g:ExtractFile = WithCond({c -> filereadable(c)}, AltVisual(g:ExtractCFile))
 let g:ExtractDir = WithCond({c -> isdirectory(c)}, AltVisual(g:ExtractCFile))
-let g:ExtractTerm = WithTrimPrefix('$ ', AltVisual(g:ExtractLine))
+"let g:ExtractTerm = WithTrimPrefix('$ ', AltVisual(g:ExtractLine))
+let g:ExtractTerm = { -> plum#term#Extract() }
 let g:ExtractJob = WithTrimPrefix('% ', AltVisual(g:ExtractLine))
 let g:ExtractVim = WithTrimPrefix(': ', AltVisual(g:ExtractLine))
 let g:ExtractWord = { -> expand('<cword>') }
@@ -129,9 +130,4 @@ if g:plum_enable_mouse_bindings
   nnoremap <RightMouse> <LeftMouse>:call Plum('n', 1)<cr>
   vnoremap <RightMouse> <LeftMouse>:<c-u>call Plum('v', 1)<cr>
   inoremap <RightMouse> <LeftMouse><esc>:call Plum('i', 1)<cr>
-endif
-
-if g:plum9_enable_key_bindings
-  nnoremap o :call Plum('n', 1)<cr>
-  vnoremap o :<c-u>call Plum('v', 1)<cr>
 endif
