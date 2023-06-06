@@ -44,6 +44,14 @@ function! Visual()
   return join(lines, "\n")
 endfunction
 
+function! ExtractTermAdapter()
+ let [result, is_match] = plum#term#Extract()
+ if is_match
+   return result
+  endif
+  return v:null
+endfunction
+
 " Combinator Library
 function! s:FirstH(extracts)
   for Extract in a:extracts
@@ -88,7 +96,7 @@ let g:ExtractCFile = { -> expand(expand('<cfile>')) }
 let g:ExtractFile = WithCond({c -> filereadable(c)}, AltVisual(g:ExtractCFile))
 let g:ExtractDir = WithCond({c -> isdirectory(c)}, AltVisual(g:ExtractCFile))
 "let g:ExtractTerm = WithTrimPrefix('$ ', AltVisual(g:ExtractLine))
-let g:ExtractTerm = { -> plum#term#Extract() }
+let g:ExtractTerm = { -> ExtractTermAdapter() }
 let g:ExtractJob = WithTrimPrefix('% ', AltVisual(g:ExtractLine))
 let g:ExtractVim = WithTrimPrefix(': ', AltVisual(g:ExtractLine))
 let g:ExtractWord = { -> expand('<cword>') }
