@@ -47,11 +47,11 @@ function! plum#term#ReadActiveBash()
   return plum#term#ReadBash()
 endfunction
 
-function! plum#term#Extract()
+function! plum#term#Extract(marker)
   let is_comment = synIDattr(synIDtrans(synID(line("."), col("$")-1, 1)), "name") ==# 'Comment'
   let cmd = plum#term#ReadActiveBash()
   let indent = 0
-  while indent < len(cmd[0]) && strpart(cmd[0], indent, 2) !=# '$ '
+  while indent < len(cmd[0]) && strpart(cmd[0], indent, 2) !=# a:marker
     let indent = indent + 1
   endwhile
   let prefix = strpart(cmd[0], 0, indent)

@@ -44,8 +44,8 @@ function! Visual()
   return join(lines, "\n")
 endfunction
 
-function! ExtractTermAdapter()
- let [result, is_match] = plum#term#Extract()
+function! ExtractTermAdapter(marker)
+ let [result, is_match] = plum#term#Extract(a:marker)
  if is_match
    return result
   endif
@@ -96,16 +96,16 @@ let g:ExtractCFile = { -> expand(expand('<cfile>')) }
 let g:ExtractFile = WithCond({c -> filereadable(c)}, AltVisual(g:ExtractCFile))
 let g:ExtractDir = WithCond({c -> isdirectory(c)}, AltVisual(g:ExtractCFile))
 "let g:ExtractTerm = WithTrimPrefix('$ ', AltVisual(g:ExtractLine))
-let g:ExtractTerm = { -> ExtractTermAdapter() }
-let g:ExtractJob = WithTrimPrefix('% ', AltVisual(g:ExtractLine))
+let g:ExtractTerm = { -> ExtractTermAdapter('$ ') }
+let g:ExtractJob = { -> ExtractTermAdapter('% ') }
 let g:ExtractVim = WithTrimPrefix(': ', AltVisual(g:ExtractLine))
 let g:ExtractWord = { -> expand('<cword>') }
 let g:ExtractRepoWord = WithCond({ _ -> trim(system('git rev-parse --is-inside-work-tree 2>/dev/null')) == 'true' }, AltVisual(g:ExtractWord))
 
 " Actions
 let g:Execute = { c -> execute(c, '') }
-let g:JobStart = { c -> jobstart(['/bin/bash', '-ic', c], g:default_job_opts) }
-let g:TermOpen = { c -> termopen(['/bin/bash', '-ic', c], g:default_term_opts) }
+let g:JobStart = { c -> jobstart([$SHELL, '-ic', c], g:default_job_opts) }
+let g:TermOpen = { c -> termopen([$SHELL, '-ic', c], g:default_term_opts) }
 let g:FsoOpen = { c -> execute('normal gF') }
 let g:Cd = { c -> execute('lcd ' . c) }
 let g:GitGrep = { c -> g:TermOpen('git grep ' . shellescape(c)) }
